@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../lib/api-client';
 import type { ApiResponse, User } from '../types';
 import { useAuthStore } from '../store/auth.store';
@@ -16,6 +16,14 @@ interface RegisterRequest {
   last_name: string;
   phone_number?: string;
   address?: string;
+}
+
+interface UpdateProfileRequest {
+  first_name?: string;
+  last_name?: string;
+  phone_number?: string;
+  address?: string;
+  date_of_birth?: string;
 }
 
 interface AuthResponse {
@@ -125,5 +133,21 @@ export const useCurrentUser = () => {
     enabled: isAuthenticated && !!accessToken,
     retry: false,
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+  });
+};
+
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  const updateUser = useAuthStore((state) => state.updateUser);
+
+  return useMutation({
+    mutationFn: (data: UpdateProfileRequest) =>
+      apiClient.patch<ApiResponse<User>>('/users/me', data),
+    onSuccess: (response) => {
+      // Update the store with the new user data
+      updateUser(response.data);
+      // Invalidate and refetch the current user query
+      queryClient.invalidateQueries({ queryKey: ['current-user'] });
+    },
   });
 };

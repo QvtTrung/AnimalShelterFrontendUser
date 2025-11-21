@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../lib/api-client';
-import type { ApiResponse, Report, PaginatedResponse } from '../types';
+import type { ApiResponse, Report } from '../types';
 
 interface ReportFilters {
   status?: string;
@@ -14,7 +14,7 @@ interface ReportFilters {
 export const useReports = (filters?: ReportFilters, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ['reports', filters],
-    queryFn: () => {
+    queryFn: async () => {
       const params = new URLSearchParams();
       if (filters) {
         Object.entries(filters).forEach(([key, value]) => {
@@ -23,9 +23,10 @@ export const useReports = (filters?: ReportFilters, options?: { enabled?: boolea
           }
         });
       }
-      return apiClient.get<ApiResponse<PaginatedResponse<Report>>>(
+      const response = await apiClient.get<ApiResponse<Report[]>>(
         `/reports?${params.toString()}`
       );
+      return response; // Return full response with meta
     },
     enabled: options?.enabled !== false,
   });
@@ -43,11 +44,18 @@ export const useCreateReport = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: Partial<Report>) => {
-      // Ensure coordinates are properly formatted
+    mutationFn: (data: Partial<Report> | FormData) => {
+      // Check if data is FormData (for multipart/form-data with images)
+      if (data instanceof FormData) {
+        // Don't set Content-Type header - let browser set it with boundary
+        // The API client will handle auth token automatically
+        return apiClient.post<ApiResponse<Report>>('/reports', data);
+      }
+
+      // Otherwise, send as JSON (for reports without images)
       const reportData = {
         ...data,
-        status: data.status || 'pending',
+        status: (data as Partial<Report>).status || 'pending',
       };
       return apiClient.post<ApiResponse<Report>>('/reports', reportData);
     },

@@ -13,7 +13,7 @@ interface RescueFilters {
 export const useRescues = (filters?: RescueFilters, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ['rescues', filters],
-    queryFn: () => {
+    queryFn: async () => {
       const params = new URLSearchParams();
       if (filters) {
         Object.entries(filters).forEach(([key, value]) => {
@@ -22,9 +22,10 @@ export const useRescues = (filters?: RescueFilters, options?: { enabled?: boolea
           }
         });
       }
-      return apiClient.get<ApiResponse<PaginatedResponse<Rescue>>>(
+      const response = await apiClient.get<ApiResponse<Rescue[]>>(
         `/rescues?${params.toString()}`
       );
+      return response; // Return full response with meta
     },
     enabled: options?.enabled !== false,
   });

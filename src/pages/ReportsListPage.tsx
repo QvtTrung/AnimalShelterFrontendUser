@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Card,
   CardBody,
+  CardFooter,
   CardHeader,
   Chip,
   Button,
@@ -9,12 +11,7 @@ import {
   Select,
   SelectItem,
   Input,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
+  Pagination,
 } from "@nextui-org/react";
 import {
   AlertTriangle,
@@ -23,28 +20,23 @@ import {
   User,
   Phone,
   Search,
-  CheckCircle,
 } from "lucide-react";
-import { useReports, useClaimReport } from "../hooks/useReports";
-import { useAuthStore } from "../store/auth.store";
-import toast from "react-hot-toast";
+import { useReports } from "../hooks/useReports";
 
 export const ReportsPage = () => {
-  const { isAuthenticated } = useAuthStore();
-  const [selectedReport, setSelectedReport] = useState<string | null>(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
-  // Filters
   const [searchQuery, setSearchQuery] = useState("");
   const [urgencyFilter, setUrgencyFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
+  const [page, setPage] = useState(1);
+  const limit = 9;
 
   const { data: reportsData, isLoading } = useReports({
     urgency_level: urgencyFilter || undefined,
     status: statusFilter || undefined,
+    search: searchQuery || undefined,
+    page,
+    limit,
   });
-
-  const claimReportMutation = useClaimReport();
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
@@ -65,66 +57,38 @@ export const ReportsPage = () => {
     switch (status) {
       case "pending":
         return "warning";
-      case "in_progress":
+      case "assigned":
         return "primary";
       case "resolved":
         return "success";
-      case "closed":
-        return "default";
       default:
         return "default";
     }
   };
 
-  const handleClaimReport = async () => {
-    if (!selectedReport) return;
-
-    if (!isAuthenticated) {
-      toast.error("Please login to claim a report");
-      onClose();
-      return;
-    }
-
-    try {
-      await claimReportMutation.mutateAsync(selectedReport);
-      toast.success("Report claimed successfully! Check your dashboard.");
-      onClose();
-    } catch (error) {
-      console.error("Failed to claim report:", error);
-      toast.error("Failed to claim report. Please try again.");
-    }
-  };
-
-  const openClaimModal = (reportId: string) => {
-    setSelectedReport(reportId);
-    onOpen();
-  };
-
-  // Filter reports by search query
-  const filteredReports = reportsData?.data?.data?.filter(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (report: any) => {
-      const matchesSearch =
-        !searchQuery ||
-        report.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        report.animal_type?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        report.location?.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesSearch;
-    }
-  );
+  // Get reports from API with server-side filtering and pagination
+  const reports = Array.isArray(reportsData?.data) ? reportsData.data : [];
+  const total = reportsData?.meta?.total || 0;
+  const totalPages = Math.ceil(total / limit);
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-linear-to-r from-orange-500 to-red-500 text-white py-16">
+      <section className="bg-gradient-to-r from-red-600 to-orange-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <AlertTriangle className="w-8 h-8" />
+              <span className="text-sm font-semibold tracking-wide uppercase">
+                RESCUE
+              </span>
+            </div>
             <h1 className="text-4xl md:text-5xl font-heading font-bold">
               Animal Reports
             </h1>
-            <p className="text-lg text-orange-50 max-w-2xl mx-auto">
-              Help animals in need by responding to urgent reports. Volunteers
-              can claim high-priority cases.
+            <p className="text-lg text-red-50 max-w-3xl mx-auto">
+              Help animals in need by responding to urgent reports. Every report
+              matters and could save a life.
             </p>
           </div>
         </div>
@@ -134,31 +98,35 @@ export const ReportsPage = () => {
       <section className="bg-white shadow-md sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Search */}
             <Input
               placeholder="Search by title, animal type, or location..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setPage(1);
+              }}
               startContent={<Search className="w-4 h-4 text-gray-400" />}
+              size="lg"
+              isClearable
+              onClear={() => setSearchQuery("")}
               classNames={{
-                input: "text-sm",
-                inputWrapper: "h-12",
+                inputWrapper: "bg-gray-50",
               }}
             />
 
-            {/* Urgency Filter */}
             <Select
-              placeholder="Filter by urgency"
+              placeholder="All Urgency Levels"
               selectedKeys={urgencyFilter ? [urgencyFilter] : []}
-              onChange={(e) => setUrgencyFilter(e.target.value)}
+              onChange={(e) => {
+                setUrgencyFilter(e.target.value);
+                setPage(1);
+              }}
+              size="lg"
               aria-label="Filter by urgency level"
               classNames={{
-                trigger: "h-12",
+                trigger: "bg-gray-50",
               }}
             >
-              <SelectItem key="" value="">
-                All Urgency Levels
-              </SelectItem>
               <SelectItem key="critical" value="critical">
                 Critical
               </SelectItem>
@@ -173,24 +141,24 @@ export const ReportsPage = () => {
               </SelectItem>
             </Select>
 
-            {/* Status Filter */}
             <Select
-              placeholder="Filter by status"
+              placeholder="All Statuses"
               selectedKeys={statusFilter ? [statusFilter] : []}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setPage(1);
+              }}
+              size="lg"
               aria-label="Filter by status"
               classNames={{
-                trigger: "h-12",
+                trigger: "bg-gray-50",
               }}
             >
-              <SelectItem key="" value="">
-                All Statuses
-              </SelectItem>
               <SelectItem key="pending" value="pending">
                 Pending
               </SelectItem>
-              <SelectItem key="in_progress" value="in_progress">
-                In Progress
+              <SelectItem key="assigned" value="assigned">
+                Assigned
               </SelectItem>
               <SelectItem key="resolved" value="resolved">
                 Resolved
@@ -209,7 +177,7 @@ export const ReportsPage = () => {
             </div>
           )}
 
-          {!isLoading && filteredReports?.length === 0 && (
+          {!isLoading && reports?.length === 0 && (
             <div className="text-center py-20">
               <AlertTriangle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500 text-lg">
@@ -220,165 +188,157 @@ export const ReportsPage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            {filteredReports?.map((report: any) => (
+            {reports?.map((report: any) => (
               <Card
                 key={report.id}
-                className={`hover:shadow-xl transition-shadow duration-300 ${
+                className={`hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 ${
                   report.urgency_level === "critical" ||
                   report.urgency_level === "high"
-                    ? "border-2 border-red-300"
+                    ? "ring-2 ring-red-200"
                     : ""
                 }`}
               >
-                <CardHeader className="p-0 relative">
+                <CardHeader className="p-0 relative overflow-hidden group">
                   {report.images && report.images.length > 0 ? (
-                    <img
-                      src={report.images[0]?.image_url}
-                      alt={report.title || "Report"}
-                      className="w-full h-48 object-cover"
-                    />
+                    <div
+                      className="relative w-full"
+                      style={{ paddingBottom: "66.67%" }}
+                    >
+                      <img
+                        src={report.images[0]?.image_url}
+                        alt={report.title || "Report"}
+                        className="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                    </div>
                   ) : (
-                    <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-                      <AlertTriangle className="w-12 h-12 text-gray-400" />
+                    <div
+                      className="relative w-full"
+                      style={{ paddingBottom: "66.67%" }}
+                    >
+                      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                        <AlertTriangle className="w-16 h-16 text-gray-400" />
+                      </div>
                     </div>
                   )}
-                  <div className="absolute top-4 right-4 flex gap-2">
+                  <div className="absolute top-3 right-3 flex flex-col gap-2">
                     <Chip
                       color={getUrgencyColor(report.urgency_level)}
                       variant="solid"
-                      className="text-white font-bold"
+                      size="sm"
+                      className="font-bold capitalize"
                     >
                       {report.urgency_level}
                     </Chip>
-                    <Chip color={getStatusColor(report.status)} variant="flat">
+                  </div>
+                  <div className="absolute top-3 left-3">
+                    <Chip
+                      color={getStatusColor(report.status)}
+                      variant="flat"
+                      size="sm"
+                      className="bg-white/90 backdrop-blur-sm capitalize"
+                    >
                       {report.status}
                     </Chip>
                   </div>
                 </CardHeader>
                 <CardBody className="p-5 space-y-3">
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-1">
                       {report.title || "Animal in Need"}
                     </h3>
-                    <p className="text-sm text-gray-600">
-                      {report.animal_type}
-                    </p>
+                    <Chip
+                      size="sm"
+                      variant="flat"
+                      className="capitalize bg-gray-100"
+                    >
+                      {report.species}
+                    </Chip>
                   </div>
 
-                  <p className="text-sm text-gray-700 line-clamp-3">
+                  <p className="text-sm text-gray-600 line-clamp-2">
                     {report.description}
                   </p>
 
-                  {/* Location */}
-                  {report.location && (
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <MapPin className="w-4 h-4" />
-                      <span className="text-sm">{report.location}</span>
-                    </div>
-                  )}
-
-                  {/* Reported Date */}
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Calendar className="w-4 h-4" />
-                    <span className="text-sm">
-                      {new Date(report.created_at).toLocaleDateString()}
-                    </span>
-                  </div>
-
-                  {/* Contact Info */}
-                  {report.contact_name && (
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <User className="w-4 h-4" />
-                      <span className="text-sm">{report.contact_name}</span>
-                    </div>
-                  )}
-
-                  {report.contact_phone && (
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Phone className="w-4 h-4" />
-                      <span className="text-sm">{report.contact_phone}</span>
-                    </div>
-                  )}
-
-                  {/* Claim Button for High/Critical Reports */}
-                  {(report.urgency_level === "high" ||
-                    report.urgency_level === "critical") &&
-                    report.status === "pending" && (
-                      <Button
-                        color="danger"
-                        className="w-full font-semibold mt-4"
-                        size="lg"
-                        onPress={() => openClaimModal(report.id)}
-                        startContent={<CheckCircle className="w-4 h-4" />}
-                      >
-                        Claim & Help
-                      </Button>
+                  <div className="space-y-2 pt-2">
+                    {report.location && (
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <MapPin className="w-4 h-4 flex-shrink-0" />
+                        <span className="text-sm line-clamp-1">
+                          {report.location}
+                        </span>
+                      </div>
                     )}
 
-                  {/* View Details for Other Reports */}
-                  {(report.urgency_level === "medium" ||
-                    report.urgency_level === "low" ||
-                    report.status !== "pending") && (
-                    <Button
-                      color="primary"
-                      variant="flat"
-                      className="w-full font-semibold mt-4"
-                      size="lg"
-                    >
-                      View Details
-                    </Button>
-                  )}
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Calendar className="w-4 h-4 flex-shrink-0" />
+                      <span className="text-sm">
+                        {report.date_created
+                          ? new Date(report.date_created).toLocaleDateString(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              }
+                            )
+                          : "N/A"}
+                      </span>
+                    </div>
+
+                    {report.contact_name && (
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <User className="w-4 h-4 flex-shrink-0" />
+                        <span className="text-sm line-clamp-1">
+                          {report.contact_name}
+                        </span>
+                      </div>
+                    )}
+
+                    {report.contact_phone && (
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Phone className="w-4 h-4 flex-shrink-0" />
+                        <span className="text-sm">{report.contact_phone}</span>
+                      </div>
+                    )}
+                  </div>
                 </CardBody>
+                <CardFooter className="p-5 pt-0">
+                  <Button
+                    as={Link}
+                    to={`/reports/${report.id}`}
+                    color="primary"
+                    variant="flat"
+                    className="w-full font-semibold"
+                    size="lg"
+                  >
+                    View Details
+                  </Button>
+                </CardFooter>
               </Card>
             ))}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-12 flex flex-col items-center gap-4">
+              <Pagination
+                total={totalPages}
+                page={page}
+                onChange={setPage}
+                color="primary"
+                size="lg"
+                showControls
+              />
+              {total > 0 && (
+                <p className="text-gray-500 text-sm">
+                  Showing {(page - 1) * limit + 1}-
+                  {Math.min(page * limit, total)} of {total} reports
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </section>
-
-      {/* Claim Modal */}
-      <Modal isOpen={isOpen} onClose={onClose} size="md">
-        <ModalContent>
-          <ModalHeader className="flex flex-col gap-1">
-            Claim Report
-          </ModalHeader>
-          <ModalBody>
-            <p className="text-gray-700">
-              Are you sure you want to claim this report? By claiming, you
-              commit to helping this animal in need.
-            </p>
-            {!isAuthenticated && (
-              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="text-sm text-yellow-800">
-                  You need to be logged in to claim a report. Please login or
-                  register first.
-                </p>
-              </div>
-            )}
-            {isAuthenticated && (
-              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  <strong>Note:</strong> Once claimed, this report will appear
-                  in your dashboard. Please coordinate with the reporter and
-                  take necessary action.
-                </p>
-              </div>
-            )}
-          </ModalBody>
-          <ModalFooter>
-            <Button color="default" variant="light" onPress={onClose}>
-              Cancel
-            </Button>
-            <Button
-              color="danger"
-              onPress={handleClaimReport}
-              isLoading={claimReportMutation.isPending}
-              isDisabled={!isAuthenticated}
-            >
-              {isAuthenticated ? "Claim Report" : "Login Required"}
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </div>
   );
 };

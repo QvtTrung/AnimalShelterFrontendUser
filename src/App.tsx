@@ -9,7 +9,9 @@ import { PetsPage } from "./pages/PetsPage";
 import { PetDetailPage } from "./pages/PetDetailPage";
 import { ReportPage } from "./pages/ReportPage";
 import { ReportsPage } from "./pages/ReportsListPage";
+import { ReportDetailPage } from "./pages/ReportDetailPage";
 import { RescuesPage } from "./pages/RescuesPage";
+import { RescueDetailPage } from "./pages/RescueDetailPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { ProfilePage } from "./pages/ProfilePage";
 
@@ -50,7 +52,9 @@ function App() {
           <Route path="/pets/:id" element={<PetDetailPage />} />
           <Route path="/report" element={<ReportPage />} />
           <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/reports/:id" element={<ReportDetailPage />} />
           <Route path="/rescues" element={<RescuesPage />} />
+          <Route path="/rescues/:id" element={<RescueDetailPage />} />
 
           {/* Protected Routes */}
           <Route

@@ -32,6 +32,7 @@ export const PetDetailPage = () => {
   const { isAuthenticated } = useAuthStore();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [adoptionNotes, setAdoptionNotes] = useState("");
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const { data: petData, isLoading, isError } = usePet(id || "");
   const createAdoption = useCreateAdoption();
@@ -120,11 +121,15 @@ export const PetDetailPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Images Section */}
           <div className="space-y-4">
-            <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-200">
+            {/* Main Image */}
+            <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-200 shadow-lg cursor-pointer group">
               <img
-                src={pet.images?.[0]?.image_url || "/placeholder-pet.jpg"}
+                src={
+                  pet.images?.[selectedImageIndex]?.image_url ||
+                  "https://placehold.co/600x400/e2e8f0/64748b?text=No+Image"
+                }
                 alt={pet.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <Chip
                 color={pet.status === "available" ? "success" : "default"}
@@ -137,19 +142,24 @@ export const PetDetailPage = () => {
             </div>
 
             {/* Thumbnail Gallery */}
-            {pet.images && pet.images.length > 1 && (
+            {pet.images && pet.images.length > 0 && (
               <div className="grid grid-cols-4 gap-2">
-                {pet.images.slice(1, 5).map((image, index) => (
-                  <div
+                {pet.images.map((image, index) => (
+                  <button
                     key={index}
-                    className="aspect-square rounded-lg overflow-hidden bg-gray-200"
+                    onClick={() => setSelectedImageIndex(index)}
+                    className={`aspect-square rounded-lg overflow-hidden bg-gray-200 transition-all duration-200 hover:ring-4 hover:ring-blue-400 ${
+                      selectedImageIndex === index
+                        ? "ring-4 ring-blue-500"
+                        : "ring-2 ring-gray-300"
+                    }`}
                   >
                     <img
                       src={image.image_url}
-                      alt={`${pet.name} ${index + 2}`}
+                      alt={`${pet.name} ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
-                  </div>
+                  </button>
                 ))}
               </div>
             )}
@@ -185,7 +195,7 @@ export const PetDetailPage = () => {
                     variant="flat"
                     startContent={<Calendar className="w-4 h-4" />}
                   >
-                    {pet.age} years old
+                    {pet.age} {pet.age_unit || "years"} old
                   </Chip>
                 )}
                 {pet.size && (

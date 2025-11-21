@@ -210,16 +210,16 @@ export const PetsPage = () => {
             {pets?.map((pet) => (
               <Card
                 key={pet.id}
-                className="hover:shadow-xl transition-shadow duration-300"
+                className="hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
               >
-                <CardHeader className="p-0 relative">
+                <CardHeader className="p-0 relative overflow-hidden group">
                   <img
                     src={
                       pet.images?.[0]?.image_url ||
                       "https://placehold.co/600x400/e2e8f0/64748b?text=No+Image"
                     }
                     alt={pet.name}
-                    className="w-full h-64 object-cover"
+                    className="w-full h-80 object-cover transition-transform duration-300 group-hover:scale-110"
                   />
                   <Chip
                     color={getStatusColor(pet.status)}

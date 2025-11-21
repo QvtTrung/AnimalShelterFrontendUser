@@ -60,15 +60,16 @@ export interface Report {
   contact_phone?: string;
   contact_email?: string;
   reported_by?: string;
-  user_created?: string;
-  images?: ReportImage[];
+  user_created?: string | Partial<User>; // Can be ID string or expanded User object
+  images?: ReportImage[]; // Transformed by backend from report_images
+  report_images?: ReportImage[]; // Raw field from database
   date_created?: string;
   date_updated?: string;
 }
 
 export interface ReportImage {
   id: string;
-  reports_id: string;
+  report_id: string;
   image_url: string;
 }
 
@@ -76,14 +77,22 @@ export interface Rescue {
   id: string;
   title: string;
   description: string;
-  status: 'planning' | 'in_progress' | 'completed' | 'cancelled';
+  status: 'planned' | 'in_progress' | 'completed' | 'cancelled';
   start_date?: string;
   end_date?: string;
-  max_volunteers?: number;
+  required_participants?: number;
   created_by?: string;
-  reports?: Report[];
-  volunteers?: RescueVolunteer[];
+  reports?: RescueReport[];
+  participants?: RescueVolunteer[];
   date_created?: string;
+}
+
+export interface RescueReport {
+  id: string;
+  report_id: string;
+  status: string;
+  note?: string;
+  report?: Report;
 }
 
 export interface RescueVolunteer {

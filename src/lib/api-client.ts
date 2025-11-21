@@ -20,8 +20,15 @@ class ApiClient {
       (config) => {
         const token = localStorage.getItem('token');
         if (token) {
+          config.headers = config.headers || {};
           config.headers.Authorization = `Bearer ${token}`;
         }
+        
+        // For FormData, let browser set Content-Type with boundary
+        if (config.data instanceof FormData && config.headers['Content-Type']) {
+          delete config.headers['Content-Type'];
+        }
+        
         return config;
       },
       (error) => Promise.reject(error)
@@ -85,7 +92,18 @@ class ApiClient {
   }
 
   async post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
-    const response: AxiosResponse<T> = await this.instance.post(url, data, config);
+    // If data is FormData, don't set Content-Type (browser will set it with boundary)
+    const isFormData = data instanceof FormData;
+    const finalConfig = isFormData 
+      ? { ...config, headers: { ...config?.headers } }
+      : config;
+    
+    // Remove Content-Type for FormData to let browser set it with boundary
+    if (isFormData && finalConfig?.headers) {
+      delete (finalConfig.headers as Record<string, unknown>)['Content-Type'];
+    }
+    
+    const response: AxiosResponse<T> = await this.instance.post(url, data, finalConfig);
     return response.data;
   }
 

@@ -9,7 +9,8 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Search, MapPin } from "lucide-react";
+import { Search, MapPin, AlertCircle } from "lucide-react";
+import toast from "react-hot-toast";
 
 // Fix default marker icon
 delete (L.Icon.Default.prototype as { _getIconUrl?: unknown })._getIconUrl;
@@ -74,6 +75,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   const [locText, setLocText] = useState(locationText || "");
   const [loading, setLoading] = useState(false);
   const [shouldRecenter, setShouldRecenter] = useState(false);
+  const [locationError, setLocationError] = useState(false);
 
   // Sync when prop value changes
   useEffect(() => {
@@ -110,6 +112,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   // Handle location text input
   const handleLocationTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLocText(e.target.value);
+    setLocationError(false); // Clear error when user types
     onLocationTextChange?.(e.target.value);
   };
 
@@ -117,6 +120,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   const handleSearch = async () => {
     if (!locText) return;
     setLoading(true);
+    setLocationError(false);
     try {
       const res = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
@@ -140,9 +144,17 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
           setLocText(display_name);
           onLocationTextChange?.(display_name);
         }
+        toast.success("Location found successfully!");
+      } else {
+        setLocationError(true);
+        toast.error(
+          "Location not found. Please try a different address or click on the map."
+        );
       }
     } catch (error) {
       console.error("Geocoding failed:", error);
+      setLocationError(true);
+      toast.error("Failed to search location. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -156,7 +168,15 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
           value={locText}
           onChange={handleLocationTextChange}
           isDisabled={readOnly}
-          startContent={<MapPin className="w-4 h-4 text-gray-400" />}
+          isInvalid={locationError}
+          errorMessage={locationError ? "Location not found" : ""}
+          startContent={
+            locationError ? (
+              <AlertCircle className="w-4 h-4 text-danger-500" />
+            ) : (
+              <MapPin className="w-4 h-4 text-gray-400" />
+            )
+          }
           classNames={{
             input: "text-gray-900",
           }}

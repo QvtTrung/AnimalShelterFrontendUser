@@ -97,7 +97,9 @@ export const DashboardPage = () => {
               <div>
                 <p className="text-sm text-gray-600">Adoptions</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {adoptionsData?.data?.data?.length || 0}
+                  {Array.isArray(adoptionsData?.data)
+                    ? adoptionsData.data.length
+                    : 0}
                 </p>
               </div>
             </CardBody>
@@ -111,7 +113,9 @@ export const DashboardPage = () => {
               <div>
                 <p className="text-sm text-gray-600">Reports</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {reportsData?.data?.data?.length || 0}
+                  {Array.isArray(reportsData?.data)
+                    ? reportsData.data.length
+                    : 0}
                 </p>
               </div>
             </CardBody>
@@ -125,7 +129,9 @@ export const DashboardPage = () => {
               <div>
                 <p className="text-sm text-gray-600">Rescue Campaigns</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {rescuesData?.data?.data?.length || 0}
+                  {Array.isArray(rescuesData?.data)
+                    ? rescuesData.data.length
+                    : 0}
                 </p>
               </div>
             </CardBody>
@@ -152,7 +158,8 @@ export const DashboardPage = () => {
                   <div className="flex justify-center py-12">
                     <Spinner size="lg" color="primary" />
                   </div>
-                ) : adoptionsData?.data?.data?.length === 0 ? (
+                ) : !Array.isArray(adoptionsData?.data) ||
+                  adoptionsData.data.length === 0 ? (
                   <div className="text-center py-12">
                     <PawPrint className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-500 mb-4">
@@ -170,7 +177,7 @@ export const DashboardPage = () => {
                 ) : (
                   <div className="space-y-4">
                     {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                    {adoptionsData?.data?.data?.map((adoption: any) => (
+                    {adoptionsData.data.map((adoption: any) => (
                       <Card key={adoption.id} className="border">
                         <CardBody className="p-5">
                           <div className="flex flex-col md:flex-row gap-4">
@@ -250,7 +257,8 @@ export const DashboardPage = () => {
                   <div className="flex justify-center py-12">
                     <Spinner size="lg" color="primary" />
                   </div>
-                ) : reportsData?.data?.data?.length === 0 ? (
+                ) : !Array.isArray(reportsData?.data) ||
+                  reportsData.data.length === 0 ? (
                   <div className="text-center py-12">
                     <AlertTriangle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-500 mb-4">
@@ -268,7 +276,7 @@ export const DashboardPage = () => {
                 ) : (
                   <div className="space-y-4">
                     {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                    {reportsData?.data?.data?.map((report: any) => (
+                    {reportsData.data.map((report: any) => (
                       <Card key={report.id} className="border">
                         <CardBody className="p-5">
                           <div className="space-y-3">
@@ -351,7 +359,8 @@ export const DashboardPage = () => {
                   <div className="flex justify-center py-12">
                     <Spinner size="lg" color="primary" />
                   </div>
-                ) : rescuesData?.data?.data?.length === 0 ? (
+                ) : !Array.isArray(rescuesData?.data) ||
+                  rescuesData.data.length === 0 ? (
                   <div className="text-center py-12">
                     <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-500 mb-4">
@@ -369,7 +378,7 @@ export const DashboardPage = () => {
                 ) : (
                   <div className="space-y-4">
                     {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                    {rescuesData?.data?.data?.map((rescue: any) => (
+                    {rescuesData.data.map((rescue: any) => (
                       <Card key={rescue.id} className="border">
                         <CardBody className="p-5">
                           <div className="flex flex-col md:flex-row gap-4">

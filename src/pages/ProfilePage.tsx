@@ -11,15 +11,15 @@ import {
 } from "@nextui-org/react";
 import { User, Mail, Phone, MapPin, Calendar, ArrowLeft } from "lucide-react";
 import { useAuthStore } from "../store/auth.store";
-import { useCurrentUser } from "../hooks/useAuth";
+import { useCurrentUser, useUpdateProfile } from "../hooks/useAuth";
 import toast from "react-hot-toast";
 
 export const ProfilePage = () => {
   const navigate = useNavigate();
-  const { user: storeUser, updateUser } = useAuthStore();
+  const { user: storeUser } = useAuthStore();
   const { data: userData, isLoading, refetch } = useCurrentUser();
+  const updateProfileMutation = useUpdateProfile();
   const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
 
   const user = userData?.data || storeUser;
 
@@ -35,23 +35,14 @@ export const ProfilePage = () => {
   };
 
   const handleSave = async () => {
-    setIsSaving(true);
     try {
-      // TODO: Implement API call to update user profile
-      // await apiClient.patch('/users/me', formData);
-
-      // For now, just update the local state
-      if (user) {
-        updateUser({ ...user, ...formData });
-        toast.success("Profile updated successfully!");
-        setIsEditing(false);
-        refetch();
-      }
+      await updateProfileMutation.mutateAsync(formData);
+      toast.success("Profile updated successfully!");
+      setIsEditing(false);
+      await refetch();
     } catch (error) {
       console.error("Failed to update profile:", error);
       toast.error("Failed to update profile. Please try again.");
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -169,14 +160,14 @@ export const ProfilePage = () => {
                     color="default"
                     variant="light"
                     onPress={handleCancel}
-                    isDisabled={isSaving}
+                    isDisabled={updateProfileMutation.isPending}
                   >
                     Cancel
                   </Button>
                   <Button
                     color="primary"
                     onPress={handleSave}
-                    isLoading={isSaving}
+                    isLoading={updateProfileMutation.isPending}
                   >
                     Save Changes
                   </Button>
