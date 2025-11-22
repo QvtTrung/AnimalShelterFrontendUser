@@ -11,6 +11,9 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
+  Textarea,
+  Select,
+  SelectItem,
 } from "@nextui-org/react";
 import {
   ArrowLeft,
@@ -19,23 +22,75 @@ import {
   AlertTriangle,
   CheckCircle,
   UserPlus,
+  PlayCircle,
+  XCircle,
+  Save,
 } from "lucide-react";
-import { useRescue, useJoinRescue } from "../hooks/useRescues";
+import {
+  useRescue,
+  useJoinRescue,
+  useStartRescue,
+  useCancelRescue,
+  useCompleteRescue,
+  useUpdateReportProgress,
+} from "../hooks/useRescues";
 import { useAuthStore } from "../store/auth.store";
 import toast from "react-hot-toast";
 import { RescueMap } from "../components/Map/RescueMap";
+import { useState } from "react";
 
 export const RescueDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const {
+    isOpen: isStartOpen,
+    onOpen: onStartOpen,
+    onOpenChange: onStartOpenChange,
+  } = useDisclosure();
+  const {
+    isOpen: isCancelOpen,
+    onOpen: onCancelOpen,
+    onOpenChange: onCancelOpenChange,
+  } = useDisclosure();
+  const {
+    isOpen: isCompleteOpen,
+    onOpen: onCompleteOpen,
+    onOpenChange: onCompleteOpenChange,
+  } = useDisclosure();
+  const {
+    isOpen: isProgressOpen,
+    onOpen: onProgressOpen,
+    onOpenChange: onProgressOpenChange,
+  } = useDisclosure();
+
+  const [cancelReason, setCancelReason] = useState("");
+  const [selectedReportProgress, setSelectedReportProgress] = useState<{
+    rescueReportId: string;
+    currentStatus: string;
+    reportTitle: string;
+  } | null>(null);
+  const [progressStatus, setProgressStatus] = useState<
+    "in_progress" | "success" | "cancelled"
+  >("in_progress");
+  const [progressNote, setProgressNote] = useState("");
 
   const { data: rescueData, isLoading, isError } = useRescue(id || "");
-  console.log("rescueData", rescueData);
   const joinRescueMutation = useJoinRescue();
+  const startRescueMutation = useStartRescue();
+  const cancelRescueMutation = useCancelRescue();
+  const completeRescueMutation = useCompleteRescue();
+  const updateProgressMutation = useUpdateReportProgress();
 
   const rescue = rescueData?.data;
+
+  // Check if current user is a participant (either leader or member)
+  const currentUserParticipant = rescue?.participants?.find(
+    (p) => p.users_id === user?.id
+  );
+  const isLeader = currentUserParticipant?.role === "leader";
+  const isMember = currentUserParticipant?.role === "member";
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -68,9 +123,107 @@ export const RescueDetailPage = () => {
         "Joined rescue campaign successfully! Check your dashboard."
       );
       onOpenChange();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Failed to join rescue:", error);
       toast.error("Failed to join rescue campaign. Please try again.");
+    }
+  };
+
+  const handleStartRescue = async () => {
+    if (!id) return;
+    try {
+      await startRescueMutation.mutateAsync(id);
+      toast.success("Rescue campaign started successfully!");
+      onStartOpenChange();
+    } catch (error: unknown) {
+      console.error("Failed to start rescue:", error);
+      const errorMessage =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ||
+        "Failed to start rescue campaign. Please try again.";
+      toast.error(errorMessage);
+    }
+  };
+
+  const handleCancelRescue = async () => {
+    if (!id) return;
+    try {
+      await cancelRescueMutation.mutateAsync({
+        rescueId: id,
+        reason: cancelReason,
+      });
+      toast.success("Rescue campaign cancelled successfully!");
+      setCancelReason("");
+      onCancelOpenChange();
+    } catch (error: unknown) {
+      console.error("Failed to cancel rescue:", error);
+      const errorMessage =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ||
+        "Failed to cancel rescue campaign. Please try again.";
+      toast.error(errorMessage);
+    }
+  };
+
+  const handleCompleteRescue = async () => {
+    if (!id) return;
+    try {
+      await completeRescueMutation.mutateAsync(id);
+      toast.success("Rescue campaign completed successfully!");
+      onCompleteOpenChange();
+    } catch (error: unknown) {
+      console.error("Failed to complete rescue:", error);
+      const errorMessage =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ||
+        "Failed to complete rescue campaign. Please try again.";
+      toast.error(errorMessage);
+    }
+  };
+
+  const handleOpenProgressModal = (rescueReport: {
+    id: string;
+    report_id: string;
+    status: string;
+    note?: string;
+    report?: { title?: string };
+  }) => {
+    const reportId = rescueReport.report_id;
+    const reportIdStr =
+      typeof reportId === "string" ? reportId : String(reportId || "");
+
+    setSelectedReportProgress({
+      rescueReportId: rescueReport.id,
+      currentStatus: rescueReport.status,
+      reportTitle:
+        rescueReport.report?.title || `Report #${reportIdStr.substring(0, 8)}`,
+    });
+    setProgressStatus(
+      rescueReport.status === "success" || rescueReport.status === "cancelled"
+        ? rescueReport.status
+        : "in_progress"
+    );
+    setProgressNote(rescueReport.note || "");
+    onProgressOpen();
+  };
+
+  const handleUpdateProgress = async () => {
+    if (!selectedReportProgress) return;
+    try {
+      await updateProgressMutation.mutateAsync({
+        rescueReportId: selectedReportProgress.rescueReportId,
+        status: progressStatus,
+        note: progressNote,
+      });
+      toast.success("Report progress updated successfully!");
+      setSelectedReportProgress(null);
+      onProgressOpenChange();
+    } catch (error: unknown) {
+      console.error("Failed to update progress:", error);
+      const errorMessage =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message || "Failed to update progress. Please try again.";
+      toast.error(errorMessage);
     }
   };
 
@@ -158,7 +311,30 @@ export const RescueDetailPage = () => {
                   Full - No more slots
                 </Chip>
               )}
+              {isLeader && (
+                <Chip color="success" size="lg" variant="flat">
+                  You are the Leader
+                </Chip>
+              )}
+              {isMember && (
+                <Chip color="primary" size="lg" variant="flat">
+                  You are a Member
+                </Chip>
+              )}
             </div>
+
+            {/* Info message for members */}
+            {isMember &&
+              (rescue.status === "planned" ||
+                rescue.status === "in_progress") && (
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    <strong>Note:</strong> You are a member of this rescue
+                    campaign. Only the rescue leader can start, complete, cancel
+                    the campaign or update report progress.
+                  </p>
+                </div>
+              )}
           </div>
 
           {/* Description */}
@@ -258,33 +434,58 @@ export const RescueDetailPage = () => {
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
-                              <p className="font-medium text-gray-900">
-                                {rescueReport.report?.title ||
-                                  `Report #${reportIdStr.substring(0, 8)}`}
-                              </p>
-                              <p className="text-sm text-gray-600 mt-1">
-                                Status: {rescueReport.status}
-                              </p>
+                              <div className="flex items-center gap-2 mb-2">
+                                <p className="font-medium text-gray-900">
+                                  {rescueReport.report?.title ||
+                                    `Report #${reportIdStr.substring(0, 8)}`}
+                                </p>
+                                <Chip
+                                  size="sm"
+                                  color={
+                                    rescueReport.status === "success"
+                                      ? "success"
+                                      : rescueReport.status === "cancelled"
+                                      ? "danger"
+                                      : "warning"
+                                  }
+                                >
+                                  {rescueReport.status}
+                                </Chip>
+                              </div>
                               {rescueReport.note && (
-                                <p className="text-sm text-gray-500 mt-1">
+                                <p className="text-sm text-gray-500 mb-1">
                                   {rescueReport.note}
                                 </p>
                               )}
                               {rescueReport.report?.location && (
-                                <p className="text-sm text-gray-500 mt-1">
+                                <p className="text-sm text-gray-500">
                                   📍 {rescueReport.report.location}
                                 </p>
                               )}
                             </div>
-                            <Button
-                              as={Link}
-                              to={`/reports/${reportIdStr}`}
-                              size="sm"
-                              variant="flat"
-                              color="primary"
-                            >
-                              View Report
-                            </Button>
+                            <div className="flex gap-2">
+                              {isLeader && rescue.status === "in_progress" && (
+                                <Button
+                                  size="sm"
+                                  variant="flat"
+                                  color="primary"
+                                  onPress={() =>
+                                    handleOpenProgressModal(rescueReport)
+                                  }
+                                >
+                                  Update Progress
+                                </Button>
+                              )}
+                              <Button
+                                as={Link}
+                                to={`/reports/${reportIdStr}`}
+                                size="sm"
+                                variant="flat"
+                                color="default"
+                              >
+                                View Report
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       );
@@ -305,7 +506,56 @@ export const RescueDetailPage = () => {
           )}
 
           {/* Action Buttons */}
-          {(rescue.status === "planned" || rescue.status === "in_progress") &&
+          {isLeader && rescue.status === "planned" && (
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button
+                color="primary"
+                size="lg"
+                className="flex-1 font-bold"
+                onPress={onStartOpen}
+                startContent={<PlayCircle className="w-5 h-5" />}
+              >
+                Start Rescue Campaign
+              </Button>
+              <Button
+                color="danger"
+                size="lg"
+                variant="flat"
+                className="flex-1 font-bold"
+                onPress={onCancelOpen}
+                startContent={<XCircle className="w-5 h-5" />}
+              >
+                Cancel Campaign
+              </Button>
+            </div>
+          )}
+
+          {isLeader && rescue.status === "in_progress" && (
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button
+                color="success"
+                size="lg"
+                className="flex-1 font-bold"
+                onPress={onCompleteOpen}
+                startContent={<CheckCircle className="w-5 h-5" />}
+              >
+                Complete Campaign
+              </Button>
+              <Button
+                color="danger"
+                size="lg"
+                variant="flat"
+                className="flex-1 font-bold"
+                onPress={onCancelOpen}
+                startContent={<XCircle className="w-5 h-5" />}
+              >
+                Cancel Campaign
+              </Button>
+            </div>
+          )}
+
+          {!isLeader &&
+            (rescue.status === "planned" || rescue.status === "in_progress") &&
             !isFull && (
               <Button
                 color="primary"
@@ -318,7 +568,7 @@ export const RescueDetailPage = () => {
               </Button>
             )}
 
-          {isFull && (
+          {!isLeader && isFull && (
             <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-6 text-center">
               <AlertTriangle className="w-12 h-12 text-orange-600 mx-auto mb-2" />
               <p className="text-orange-800 font-medium">
@@ -415,6 +665,231 @@ export const RescueDetailPage = () => {
                   className="font-semibold"
                 >
                   {isAuthenticated ? "Join Campaign" : "Login Required"}
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      {/* Start Rescue Modal */}
+      <Modal isOpen={isStartOpen} onOpenChange={onStartOpenChange} size="md">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>
+                <div className="flex items-center gap-2">
+                  <PlayCircle className="w-6 h-6 text-blue-500" />
+                  <h2 className="text-2xl font-bold">Start Rescue Campaign</h2>
+                </div>
+              </ModalHeader>
+              <ModalBody>
+                <div className="space-y-4">
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-800">
+                      <strong>This will:</strong>
+                    </p>
+                    <ul className="list-disc list-inside text-sm text-blue-800 mt-2 space-y-1">
+                      <li>Change the rescue status to "In Progress"</li>
+                      <li>Notify all participants</li>
+                      <li>Allow you to track and update report progress</li>
+                    </ul>
+                  </div>
+                  <p className="text-gray-700">
+                    Are you sure you want to start this rescue campaign?
+                  </p>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="light" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button
+                  color="primary"
+                  onPress={handleStartRescue}
+                  isLoading={startRescueMutation.isPending}
+                  startContent={<PlayCircle className="w-4 h-4" />}
+                >
+                  Start Campaign
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      {/* Cancel Rescue Modal */}
+      <Modal isOpen={isCancelOpen} onOpenChange={onCancelOpenChange} size="md">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>
+                <div className="flex items-center gap-2">
+                  <XCircle className="w-6 h-6 text-red-500" />
+                  <h2 className="text-2xl font-bold">Cancel Rescue Campaign</h2>
+                </div>
+              </ModalHeader>
+              <ModalBody>
+                <div className="space-y-4">
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-800">
+                      <strong>Warning:</strong> All assigned reports will be
+                      returned to pending status.
+                    </p>
+                  </div>
+                  <p className="text-gray-700">
+                    Are you sure you want to cancel this rescue campaign?
+                  </p>
+                  <Textarea
+                    label="Reason for cancellation (optional)"
+                    placeholder="Enter reason..."
+                    value={cancelReason}
+                    onValueChange={setCancelReason}
+                    minRows={3}
+                  />
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="light" onPress={onClose}>
+                  Back
+                </Button>
+                <Button
+                  color="danger"
+                  onPress={handleCancelRescue}
+                  isLoading={cancelRescueMutation.isPending}
+                  startContent={<XCircle className="w-4 h-4" />}
+                >
+                  Cancel Campaign
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      {/* Complete Rescue Modal */}
+      <Modal
+        isOpen={isCompleteOpen}
+        onOpenChange={onCompleteOpenChange}
+        size="md"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-6 h-6 text-green-500" />
+                  <h2 className="text-2xl font-bold">
+                    Complete Rescue Campaign
+                  </h2>
+                </div>
+              </ModalHeader>
+              <ModalBody>
+                <div className="space-y-4">
+                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800">
+                      <strong>This will:</strong>
+                    </p>
+                    <ul className="list-disc list-inside text-sm text-green-800 mt-2 space-y-1">
+                      <li>Mark the rescue as "Completed"</li>
+                      <li>Update all successful reports to "Resolved"</li>
+                      <li>Return cancelled/incomplete reports to "Pending"</li>
+                      <li>Notify all participants of completion</li>
+                    </ul>
+                  </div>
+                  <p className="text-gray-700">
+                    Are you sure you want to complete this rescue campaign?
+                  </p>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="light" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button
+                  color="success"
+                  onPress={handleCompleteRescue}
+                  isLoading={completeRescueMutation.isPending}
+                  startContent={<CheckCircle className="w-4 h-4" />}
+                >
+                  Complete Campaign
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      {/* Update Report Progress Modal */}
+      <Modal
+        isOpen={isProgressOpen}
+        onOpenChange={onProgressOpenChange}
+        size="md"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>
+                <div className="flex items-center gap-2">
+                  <Save className="w-6 h-6 text-blue-500" />
+                  <h2 className="text-2xl font-bold">Update Report Progress</h2>
+                </div>
+              </ModalHeader>
+              <ModalBody>
+                <div className="space-y-4">
+                  <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                    <p className="font-medium text-gray-900">
+                      {selectedReportProgress?.reportTitle}
+                    </p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Current status: {selectedReportProgress?.currentStatus}
+                    </p>
+                  </div>
+
+                  <Select
+                    label="New Status"
+                    placeholder="Select status"
+                    selectedKeys={[progressStatus]}
+                    onChange={(e) =>
+                      setProgressStatus(
+                        e.target.value as
+                          | "in_progress"
+                          | "success"
+                          | "cancelled"
+                      )
+                    }
+                  >
+                    <SelectItem key="in_progress" value="in_progress">
+                      In Progress
+                    </SelectItem>
+                    <SelectItem key="success" value="success">
+                      Success (Rescued)
+                    </SelectItem>
+                    <SelectItem key="cancelled" value="cancelled">
+                      Cancelled
+                    </SelectItem>
+                  </Select>
+
+                  <Textarea
+                    label="Progress Note"
+                    placeholder="Add a note about the progress..."
+                    value={progressNote}
+                    onValueChange={setProgressNote}
+                    minRows={3}
+                  />
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="light" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button
+                  color="primary"
+                  onPress={handleUpdateProgress}
+                  isLoading={updateProgressMutation.isPending}
+                  startContent={<Save className="w-4 h-4" />}
+                >
+                  Update Progress
                 </Button>
               </ModalFooter>
             </>

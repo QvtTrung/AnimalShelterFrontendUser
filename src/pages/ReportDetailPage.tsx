@@ -374,21 +374,24 @@ export const ReportDetailPage = () => {
                   </div>
 
                   {/* Claim Button */}
-                  {(report.urgency_level === "high" ||
-                    report.urgency_level === "critical") &&
-                    report.status === "pending" && (
-                      <div className="mt-5 pt-4 border-t border-gray-200">
-                        <Button
-                          color="danger"
-                          size="md"
-                          className="w-full font-semibold"
-                          onPress={onOpen}
-                          startContent={<CheckCircle className="w-4 h-4" />}
-                        >
-                          Claim This Report
-                        </Button>
-                      </div>
-                    )}
+                  {report.status === "pending" && (
+                    <div className="mt-5 pt-4 border-t border-gray-200">
+                      <Button
+                        color={
+                          report.urgency_level === "critical" ||
+                          report.urgency_level === "high"
+                            ? "danger"
+                            : "primary"
+                        }
+                        size="md"
+                        className="w-full font-semibold"
+                        onPress={onOpen}
+                        startContent={<CheckCircle className="w-4 h-4" />}
+                      >
+                        Offer Help
+                      </Button>
+                    </div>
+                  )}
                 </CardBody>
               </Card>
             </div>
@@ -402,7 +405,7 @@ export const ReportDetailPage = () => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                <h2 className="text-2xl font-bold">Claim This Report</h2>
+                <h2 className="text-2xl font-bold">Offer Help</h2>
                 <p className="text-sm text-gray-600 font-normal">
                   Commit to helping this animal in need
                 </p>
@@ -412,8 +415,8 @@ export const ReportDetailPage = () => {
                   {!isAuthenticated && (
                     <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                       <p className="text-sm text-yellow-800">
-                        You need to be logged in to claim a report. Please login
-                        or register first.
+                        You need to be logged in to offer help. Please login or
+                        register first.
                       </p>
                     </div>
                   )}
@@ -421,9 +424,10 @@ export const ReportDetailPage = () => {
                     <>
                       <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                         <p className="text-sm text-blue-800">
-                          <strong>Note:</strong> Once claimed, this report will
-                          appear in your dashboard. Please coordinate with the
-                          reporter and take necessary action.
+                          <strong>Note:</strong> A rescue campaign will be
+                          created and this report will appear in your dashboard.
+                          Please coordinate with the reporter and take necessary
+                          action.
                         </p>
                       </div>
                       <div className="space-y-2">
@@ -449,13 +453,13 @@ export const ReportDetailPage = () => {
                   Cancel
                 </Button>
                 <Button
-                  color="danger"
+                  color="primary"
                   onPress={handleClaimReport}
                   isLoading={claimReportMutation.isPending}
                   isDisabled={!isAuthenticated}
                   className="font-semibold"
                 >
-                  {isAuthenticated ? "Claim Report" : "Login Required"}
+                  {isAuthenticated ? "Offer Help" : "Login Required"}
                 </Button>
               </ModalFooter>
             </>

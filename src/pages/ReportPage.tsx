@@ -310,11 +310,11 @@ export const ReportPage = () => {
                   </Radio>
                 </RadioGroup>
 
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <p className="text-sm text-yellow-800">
-                    <strong>High & Critical reports</strong> can be claimed
-                    directly by volunteers for immediate rescue without waiting
-                    for a full campaign.
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-blue-800">
+                    <strong>All reports</strong> can be claimed by volunteers
+                    who want to help. A rescue campaign will be automatically
+                    created.
                   </p>
                 </div>
 

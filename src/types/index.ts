@@ -97,11 +97,12 @@ export interface RescueReport {
 
 export interface RescueVolunteer {
   id: string;
-  rescue_id: string;
-  user_id: string;
+  rescues_id: string;
+  users_id: string;
+  role: 'leader' | 'member';
   user?: User;
-  status: 'pending' | 'confirmed' | 'cancelled';
-  date_joined?: string;
+  date_created?: string;
+  date_updated?: string;
 }
 
 export interface Adoption {

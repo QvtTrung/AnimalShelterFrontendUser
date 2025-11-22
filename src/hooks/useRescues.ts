@@ -85,3 +85,64 @@ export const useMyRescues = () => {
     queryFn: () => apiClient.get<ApiResponse<Rescue[]>>('/rescues/me'),
   });
 };
+
+export const useStartRescue = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (rescueId: string) =>
+      apiClient.post<ApiResponse<void>>(`/rescues/${rescueId}/start`),
+    onSuccess: (_, rescueId) => {
+      queryClient.invalidateQueries({ queryKey: ['rescues'] });
+      queryClient.invalidateQueries({ queryKey: ['rescue', rescueId] });
+      queryClient.invalidateQueries({ queryKey: ['my-rescues'] });
+    },
+  });
+};
+
+export const useCancelRescue = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ rescueId, reason }: { rescueId: string; reason?: string }) =>
+      apiClient.post<ApiResponse<void>>(`/rescues/${rescueId}/cancel`, { reason }),
+    onSuccess: (_, { rescueId }) => {
+      queryClient.invalidateQueries({ queryKey: ['rescues'] });
+      queryClient.invalidateQueries({ queryKey: ['rescue', rescueId] });
+      queryClient.invalidateQueries({ queryKey: ['my-rescues'] });
+    },
+  });
+};
+
+export const useCompleteRescue = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (rescueId: string) =>
+      apiClient.post<ApiResponse<void>>(`/rescues/${rescueId}/complete`),
+    onSuccess: (_, rescueId) => {
+      queryClient.invalidateQueries({ queryKey: ['rescues'] });
+      queryClient.invalidateQueries({ queryKey: ['rescue', rescueId] });
+      queryClient.invalidateQueries({ queryKey: ['my-rescues'] });
+      queryClient.invalidateQueries({ queryKey: ['reports'] });
+    },
+  });
+};
+
+export const useUpdateReportProgress = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ rescueReportId, status, note }: { 
+      rescueReportId: string; 
+      status: 'in_progress' | 'success' | 'cancelled'; 
+      note?: string;
+    }) =>
+      apiClient.patch<ApiResponse<void>>(`/rescues/reports/${rescueReportId}/progress`, { status, note }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rescues'] });
+      queryClient.invalidateQueries({ queryKey: ['rescue'] });
+      queryClient.invalidateQueries({ queryKey: ['my-rescues'] });
+    },
+  });
+};
