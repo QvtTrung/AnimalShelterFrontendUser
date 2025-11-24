@@ -19,6 +19,7 @@ import { useState } from "react";
 import { useAuthStore } from "../../store/auth.store";
 import { useLogout } from "../../hooks/useAuth";
 import toast from "react-hot-toast";
+import { NotificationDropdown } from "../notifications";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -89,57 +90,69 @@ export const Header = () => {
         ))}
       </NavbarContent>
 
-      <NavbarContent justify="end">
-        {isAuthenticated && user ? (
-          <Dropdown placement="bottom-end">
-            <DropdownTrigger>
-              <Avatar
-                isBordered
-                as="button"
-                className="transition-transform"
-                color="primary"
-                name={`${user.first_name} ${user.last_name}`}
-                size="md"
-                src={user.avatar}
-              />
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Profile Actions" variant="flat">
-              <DropdownItem
-                key="profile"
-                className="h-14 gap-2"
-                textValue="Profile Info"
-              >
-                <p className="font-semibold">Signed in as</p>
-                <p className="font-semibold">{user.email}</p>
-              </DropdownItem>
-              <DropdownItem
-                key="dashboard"
-                startContent={<LayoutDashboard className="w-4 h-4" />}
-                textValue="My Dashboard"
-                onPress={() => navigate("/dashboard")}
-              >
-                My Dashboard
-              </DropdownItem>
-              <DropdownItem
-                key="profile-settings"
-                startContent={<UserIcon className="w-4 h-4" />}
-                textValue="Profile Settings"
-                onPress={() => navigate("/profile")}
-              >
-                Profile Settings
-              </DropdownItem>
-              <DropdownItem
-                key="logout"
-                color="danger"
-                startContent={<LogOut className="w-4 h-4" />}
-                textValue="Log Out"
-                onPress={handleLogout}
-              >
-                Log Out
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-        ) : (
+      <NavbarContent justify="end" className="gap-4">
+        {isAuthenticated && user && (
+          <>
+            {/* Notification Dropdown */}
+            <NavbarItem className="hidden sm:flex">
+              <NotificationDropdown />
+            </NavbarItem>
+
+            {/* User Dropdown */}
+            <NavbarItem>
+              <Dropdown placement="bottom-end">
+                <DropdownTrigger>
+                  <Avatar
+                    isBordered
+                    as="button"
+                    className="transition-transform"
+                    color="primary"
+                    name={`${user.first_name} ${user.last_name}`}
+                    size="md"
+                    src={user.avatar}
+                  />
+                </DropdownTrigger>
+                <DropdownMenu aria-label="Profile Actions" variant="flat">
+                  <DropdownItem
+                    key="profile"
+                    className="h-14 gap-2"
+                    textValue="Profile Info"
+                  >
+                    <p className="font-semibold">Signed in as</p>
+                    <p className="font-semibold">{user.email}</p>
+                  </DropdownItem>
+                  <DropdownItem
+                    key="dashboard"
+                    startContent={<LayoutDashboard className="w-4 h-4" />}
+                    textValue="My Dashboard"
+                    onPress={() => navigate("/dashboard")}
+                  >
+                    My Dashboard
+                  </DropdownItem>
+                  <DropdownItem
+                    key="profile-settings"
+                    startContent={<UserIcon className="w-4 h-4" />}
+                    textValue="Profile Settings"
+                    onPress={() => navigate("/profile")}
+                  >
+                    Profile Settings
+                  </DropdownItem>
+                  <DropdownItem
+                    key="logout"
+                    color="danger"
+                    startContent={<LogOut className="w-4 h-4" />}
+                    textValue="Log Out"
+                    onPress={handleLogout}
+                  >
+                    Log Out
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </NavbarItem>
+          </>
+        )}
+
+        {!isAuthenticated && (
           <div className="flex gap-2">
             <NavbarItem className="hidden lg:flex">
               <Button

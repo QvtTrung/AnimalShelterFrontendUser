@@ -140,6 +140,11 @@ class ApiClient {
 
     return response.data;
   }
+
+  // Get the axios instance for direct access if needed
+  getInstance(): AxiosInstance {
+    return this.instance;
+  }
 }
 
 export const apiClient = new ApiClient();

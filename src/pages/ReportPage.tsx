@@ -313,8 +313,7 @@ export const ReportPage = () => {
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <p className="text-sm text-blue-800">
                     <strong>All reports</strong> can be claimed by volunteers
-                    who want to help. A rescue campaign will be automatically
-                    created.
+                    who want to help.
                   </p>
                 </div>
 

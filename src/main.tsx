@@ -5,6 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import "./index.css";
 import App from "./App.tsx";
+import { cleanupLocalStorage } from "./utils/localStorage-cleanup";
+
+// Clean up old localStorage keys on app initialization
+cleanupLocalStorage();
 
 const queryClient = new QueryClient({
   defaultOptions: {

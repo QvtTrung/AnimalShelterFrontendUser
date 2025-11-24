@@ -118,6 +118,19 @@ export interface Adoption {
   date_created?: string;
 }
 
+export interface Notification {
+  id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  type: 'adoption' | 'rescue' | 'report' | 'system';
+  related_id?: string;
+  is_read: boolean;
+  read_at?: string;
+  date_created?: string;
+  date_updated?: string;
+}
+
 export interface ApiResponse<T> {
   status: string;
   message: string;
