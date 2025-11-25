@@ -83,6 +83,7 @@ export const useMyRescues = () => {
   return useQuery({
     queryKey: ['my-rescues'],
     queryFn: () => apiClient.get<ApiResponse<Rescue[]>>('/rescues/me'),
+    staleTime: 0, // Always refetch on mount to prevent stale data on login/logout
   });
 };
 

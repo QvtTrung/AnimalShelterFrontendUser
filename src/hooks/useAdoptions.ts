@@ -69,5 +69,6 @@ export const useMyAdoptions = () => {
   return useQuery({
     queryKey: ['my-adoptions'],
     queryFn: () => apiClient.get<ApiResponse<Adoption[]>>('/adoptions/me'),
+    staleTime: 0, // Always refetch on mount to prevent stale data on login/logout
   });
 };

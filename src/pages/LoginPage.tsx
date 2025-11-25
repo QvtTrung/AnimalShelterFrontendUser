@@ -23,7 +23,7 @@ export const LoginPage = () => {
     try {
       await login.mutateAsync({ email, password });
       toast.success("Welcome back!");
-      navigate(redirectTo, { replace: true });
+      navigate("/dashboard", { replace: true });
     } catch (error) {
       console.error("Login failed:", error);
       toast.error("Invalid email or password. Please try again.");

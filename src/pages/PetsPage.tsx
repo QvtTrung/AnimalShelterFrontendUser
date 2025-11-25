@@ -22,6 +22,7 @@ export const PetsPage = () => {
   const [speciesFilter, setSpeciesFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("available");
   const [sizeFilter, setSizeFilter] = useState<string>("");
+  const [sortBy, setSortBy] = useState<string>("newest");
   const [page, setPage] = useState(1);
   const [limit] = useState(9);
 
@@ -46,6 +47,7 @@ export const PetsPage = () => {
   ];
 
   const statuses = [
+    { label: "All Status", value: "" },
     { label: "Available", value: "available" },
     { label: "Adopted", value: "adopted" },
     { label: "Pending", value: "pending" },
@@ -58,7 +60,17 @@ export const PetsPage = () => {
   ];
 
   // API response structure: { status: 'success', message: string, data: Pet[], meta: { total: number } }
-  const pets: Pet[] = Array.isArray(petsData?.data) ? petsData.data : [];
+  let pets: Pet[] = Array.isArray(petsData?.data) ? petsData.data : [];
+
+  // Apply client-side sorting by date_created
+  if (pets.length > 0) {
+    pets = [...pets].sort((a, b) => {
+      const dateA = a.date_created ? new Date(a.date_created).getTime() : 0;
+      const dateB = b.date_created ? new Date(b.date_created).getTime() : 0;
+      return sortBy === "newest" ? dateB - dateA : dateA - dateB;
+    });
+  }
+
   const total = petsData?.meta?.total || 0;
 
   // Calculate pagination
@@ -102,9 +114,9 @@ export const PetsPage = () => {
       </section>
 
       {/* Filters Section */}
-      <section className="bg-white shadow-md sticky top-0 z-10">
+      <section className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <Input
               placeholder="Search pets by name..."
               value={searchTerm}
@@ -159,7 +171,7 @@ export const PetsPage = () => {
               ))}
             </Select>
             <Select
-              placeholder="Filter by status"
+              placeholder="All Status"
               selectedKeys={statusFilter ? [statusFilter] : []}
               onChange={(e) => {
                 setStatusFilter(e.target.value);
@@ -176,6 +188,23 @@ export const PetsPage = () => {
                   {s.label}
                 </SelectItem>
               ))}
+            </Select>
+            <Select
+              placeholder="Sort by Date"
+              selectedKeys={[sortBy]}
+              onChange={(e) => setSortBy(e.target.value)}
+              size="lg"
+              aria-label="Sort by date"
+              classNames={{
+                trigger: "bg-gray-50",
+              }}
+            >
+              <SelectItem key="newest" value="newest">
+                Newest First
+              </SelectItem>
+              <SelectItem key="oldest" value="oldest">
+                Oldest First
+              </SelectItem>
             </Select>
           </div>
         </div>
@@ -223,7 +252,7 @@ export const PetsPage = () => {
                   />
                   <Chip
                     color={getStatusColor(pet.status)}
-                    className="absolute top-4 right-4"
+                    className="absolute top-4 right-4 backdrop-blur-sm bg-white/90 shadow-lg font-semibold"
                     variant="flat"
                   >
                     {pet.status}

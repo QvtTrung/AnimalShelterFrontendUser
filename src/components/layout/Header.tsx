@@ -32,14 +32,14 @@ export const Header = () => {
     { label: "Adopt a Pet", path: "/pets" },
     { label: "Report Animal", path: "/report" },
     { label: "View Reports", path: "/reports" },
-    { label: "Rescue Campaigns", path: "/rescues" },
+    { label: "Rescues", path: "/rescues" },
   ];
 
   const handleLogout = async () => {
     try {
       await logout.mutateAsync();
       toast.success("Logged out successfully!");
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       console.error("Logout error:", error);
       toast.error("Logout failed. Please try again.");

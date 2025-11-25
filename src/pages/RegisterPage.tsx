@@ -47,7 +47,7 @@ export const RegisterPage = () => {
         phone_number: formData.phone_number || undefined,
       });
       toast.success("Account created successfully! Welcome!");
-      navigate("/");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Registration error:", error);
       setError("Registration failed. Please try again.");

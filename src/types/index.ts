@@ -32,15 +32,16 @@ export interface Pet {
   status: 'available' | 'pending' | 'adopted';
   adoption_status: 'available' | 'pending' | 'adopted';
   rescue_id?: string;
-  images?: PetImage[];
+  images?: PetImage[]; // Deprecated: use pet_images
+  pet_images?: PetImage[]; // Directus relation field name
   date_created?: string;
 }
 
 export interface PetImage {
   id: string;
-  pet_id: string;
+  pet_id?: string;
   image_url: string;
-  is_primary: boolean;
+  is_primary?: boolean;
 }
 
 export interface Report {
@@ -107,10 +108,10 @@ export interface RescueVolunteer {
 
 export interface Adoption {
   id: string;
-  pet_id: string;
-  user_id: string;
-  pet?: Pet;
-  user?: User;
+  pet_id: string | Pet; // Can be ID string or expanded Pet object
+  user_id: string | User; // Can be ID string or expanded User object
+  pet?: Pet; // Deprecated: use pet_id when expanded
+  user?: User; // Deprecated: use user_id when expanded
   status: 'pending' | 'confirming' | 'confirmed' | 'completed' | 'cancelled';
   appointment_date?: string;
   approval_date?: string;

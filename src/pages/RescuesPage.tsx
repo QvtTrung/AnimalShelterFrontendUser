@@ -15,13 +15,20 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Select,
+  SelectItem,
+  DateRangePicker as NextUIDateRangePicker,
 } from "@nextui-org/react";
 import { Calendar } from "lucide-react";
 import { useRescues } from "../hooks/useRescues";
 
 export const RescuesPage = () => {
-  const [selectedTab, setSelectedTab] = useState("planned");
+  const [selectedTab, setSelectedTab] = useState("all");
   const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState<string>("newest");
+  const [dateRange, setDateRange] = useState<{ start: any; end: any } | null>(
+    null
+  );
   const limit = 9;
 
   const {
@@ -35,7 +42,39 @@ export const RescuesPage = () => {
   });
   console.log("rescuesData", rescuesData);
 
-  const rescues = Array.isArray(rescuesData?.data) ? rescuesData.data : [];
+  let rescues = Array.isArray(rescuesData?.data) ? rescuesData.data : [];
+
+  // Apply date range filter
+  if (dateRange?.start && dateRange?.end && rescues.length > 0) {
+    const startTime = new Date(
+      dateRange.start.year,
+      dateRange.start.month - 1,
+      dateRange.start.day
+    ).getTime();
+    const endTime = new Date(
+      dateRange.end.year,
+      dateRange.end.month - 1,
+      dateRange.end.day,
+      23,
+      59,
+      59
+    ).getTime();
+    rescues = rescues.filter((rescue) => {
+      if (!rescue.date_created) return false;
+      const rescueTime = new Date(rescue.date_created).getTime();
+      return rescueTime >= startTime && rescueTime <= endTime;
+    });
+  }
+
+  // Apply client-side sorting by date_created
+  if (rescues.length > 0) {
+    rescues = [...rescues].sort((a, b) => {
+      const dateA = a.date_created ? new Date(a.date_created).getTime() : 0;
+      const dateB = b.date_created ? new Date(b.date_created).getTime() : 0;
+      return sortBy === "newest" ? dateB - dateA : dateA - dateB;
+    });
+  }
+
   const total = rescuesData?.meta?.total || 0;
   const totalPages = Math.ceil(total / limit);
 
@@ -71,29 +110,57 @@ export const RescuesPage = () => {
         </div>
       </section>
 
-      {/* Tabs Section */}
-      <section className="bg-white shadow-md sticky top-0 z-10">
+      {/* Tabs and Filters Section */}
+      <section className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Tabs
-            selectedKey={selectedTab}
-            onSelectionChange={(key) => {
-              setSelectedTab(key.toString());
-              setPage(1);
-            }}
-            color="primary"
-            size="lg"
-            classNames={{
-              tabList: "gap-6",
-              cursor: "bg-primary-500",
-              tab: "h-12",
-            }}
-          >
-            <Tab key="planned" title="Planned" />
-            <Tab key="in_progress" title="In Progress" />
-            <Tab key="completed" title="Completed" />
-            <Tab key="cancelled" title="Cancelled" />
-            <Tab key="all" title="All Campaigns" />
-          </Tabs>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <Tabs
+              selectedKey={selectedTab}
+              onSelectionChange={(key) => {
+                setSelectedTab(key.toString());
+                setPage(1);
+              }}
+              color="primary"
+              size="lg"
+              classNames={{
+                tabList: "gap-6",
+                cursor: "bg-primary-500",
+                tab: "h-12",
+              }}
+            >
+              <Tab key="all" title="All Campaigns" />
+              <Tab key="planned" title="Planned" />
+              <Tab key="in_progress" title="In Progress" />
+              <Tab key="completed" title="Completed" />
+              <Tab key="cancelled" title="Cancelled" />
+            </Tabs>
+            <div className="flex flex-wrap items-end gap-2">
+              <NextUIDateRangePicker
+                label="Date Range"
+                className="w-64"
+                value={dateRange}
+                onChange={setDateRange}
+                size="sm"
+                aria-label="Date range filter"
+                showMonthAndYearPickers
+                visibleMonths={2}
+              />
+              <Select
+                label="Sort"
+                selectedKeys={[sortBy]}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-36"
+                size="sm"
+              >
+                <SelectItem key="newest" value="newest">
+                  Newest First
+                </SelectItem>
+                <SelectItem key="oldest" value="oldest">
+                  Oldest First
+                </SelectItem>
+              </Select>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -171,9 +238,9 @@ export const RescuesPage = () => {
                           <div className="flex items-center gap-2 text-gray-700">
                             <Calendar className="w-4 h-4" />
                             <span className="text-base">
-                              {rescue.start_date
+                              {rescue.date_created
                                 ? new Date(
-                                    rescue.start_date
+                                    rescue.date_created
                                   ).toLocaleDateString()
                                 : "Date TBD"}
                             </span>

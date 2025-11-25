@@ -80,15 +80,20 @@ export const useRegister = () => {
 
 export const useLogout = () => {
   const logout = useAuthStore((state) => state.logout);
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: () => apiClient.post<ApiResponse<void>>('/auth/logout'),
     onSuccess: () => {
       logout();
+      // Clear all React Query cache to prevent showing old user's data
+      queryClient.clear();
     },
     onError: () => {
       // Logout even if API call fails
       logout();
+      // Clear cache even on error
+      queryClient.clear();
     },
   });
 };

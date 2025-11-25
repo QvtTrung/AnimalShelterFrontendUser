@@ -12,6 +12,7 @@ import {
   SelectItem,
   Input,
   Pagination,
+  DateRangePicker as NextUIDateRangePicker,
 } from "@nextui-org/react";
 import {
   AlertTriangle,
@@ -27,6 +28,10 @@ export const ReportsPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [urgencyFilter, setUrgencyFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
+  const [sortBy, setSortBy] = useState<string>("newest");
+  const [dateRange, setDateRange] = useState<{ start: any; end: any } | null>(
+    null
+  );
   const [page, setPage] = useState(1);
   const limit = 9;
 
@@ -67,7 +72,39 @@ export const ReportsPage = () => {
   };
 
   // Get reports from API with server-side filtering and pagination
-  const reports = Array.isArray(reportsData?.data) ? reportsData.data : [];
+  let reports = Array.isArray(reportsData?.data) ? reportsData.data : [];
+
+  // Apply date range filter
+  if (dateRange?.start && dateRange?.end && reports.length > 0) {
+    const startTime = new Date(
+      dateRange.start.year,
+      dateRange.start.month - 1,
+      dateRange.start.day
+    ).getTime();
+    const endTime = new Date(
+      dateRange.end.year,
+      dateRange.end.month - 1,
+      dateRange.end.day,
+      23,
+      59,
+      59
+    ).getTime();
+    reports = reports.filter((report) => {
+      if (!report.date_created) return false;
+      const reportTime = new Date(report.date_created).getTime();
+      return reportTime >= startTime && reportTime <= endTime;
+    });
+  }
+
+  // Apply client-side sorting by date_created
+  if (reports.length > 0) {
+    reports = [...reports].sort((a, b) => {
+      const dateA = a.date_created ? new Date(a.date_created).getTime() : 0;
+      const dateB = b.date_created ? new Date(b.date_created).getTime() : 0;
+      return sortBy === "newest" ? dateB - dateA : dateA - dateB;
+    });
+  }
+
   const total = reportsData?.meta?.total || 0;
   const totalPages = Math.ceil(total / limit);
 
@@ -95,9 +132,9 @@ export const ReportsPage = () => {
       </section>
 
       {/* Filters Section */}
-      <section className="bg-white shadow-md sticky top-0 z-10">
+      <section className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="flex flex-wrap items-end gap-2">
             <Input
               placeholder="Search by title, animal type, or location..."
               value={searchQuery}
@@ -106,9 +143,10 @@ export const ReportsPage = () => {
                 setPage(1);
               }}
               startContent={<Search className="w-4 h-4 text-gray-400" />}
-              size="lg"
+              size="sm"
               isClearable
               onClear={() => setSearchQuery("")}
+              className="w-64"
               classNames={{
                 inputWrapper: "bg-gray-50",
               }}
@@ -121,8 +159,9 @@ export const ReportsPage = () => {
                 setUrgencyFilter(e.target.value);
                 setPage(1);
               }}
-              size="lg"
+              size="sm"
               aria-label="Filter by urgency level"
+              className="w-40"
               classNames={{
                 trigger: "bg-gray-50",
               }}
@@ -148,8 +187,9 @@ export const ReportsPage = () => {
                 setStatusFilter(e.target.value);
                 setPage(1);
               }}
-              size="lg"
+              size="sm"
               aria-label="Filter by status"
+              className="w-32"
               classNames={{
                 trigger: "bg-gray-50",
               }}
@@ -162,6 +202,36 @@ export const ReportsPage = () => {
               </SelectItem>
               <SelectItem key="resolved" value="resolved">
                 Resolved
+              </SelectItem>
+            </Select>
+
+            <NextUIDateRangePicker
+              label="Date Range"
+              className="w-64"
+              value={dateRange}
+              onChange={setDateRange}
+              size="sm"
+              aria-label="Date range filter"
+              showMonthAndYearPickers
+              visibleMonths={2}
+            />
+
+            <Select
+              label="Sort"
+              selectedKeys={[sortBy]}
+              onChange={(e) => setSortBy(e.target.value)}
+              size="sm"
+              aria-label="Sort by date"
+              className="w-36"
+              classNames={{
+                trigger: "bg-gray-50",
+              }}
+            >
+              <SelectItem key="newest" value="newest">
+                Newest First
+              </SelectItem>
+              <SelectItem key="oldest" value="oldest">
+                Oldest First
               </SelectItem>
             </Select>
           </div>

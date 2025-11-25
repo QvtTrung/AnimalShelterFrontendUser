@@ -35,7 +35,7 @@ export const HomePage = () => {
       {/* Hero Section */}
       <section className="relative bg-linear-to-br from-primary-50 to-primary-100 paw-pattern -mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
-          <div className="text-center space-y-8">
+          <div className="text-center space-y-8 mt-20">
             <h1 className="text-4xl md:text-6xl font-heading font-bold text-gray-900">
               Highest Quality Care For Pets
               <br />

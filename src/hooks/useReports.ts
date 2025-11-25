@@ -83,5 +83,6 @@ export const useMyReports = () => {
   return useQuery({
     queryKey: ['my-reports'],
     queryFn: () => apiClient.get<ApiResponse<Report[]>>('/reports/me'),
+    staleTime: 0, // Always refetch on mount to prevent stale data on login/logout
   });
 };
