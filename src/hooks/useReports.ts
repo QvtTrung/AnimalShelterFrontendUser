@@ -7,6 +7,7 @@ interface ReportFilters {
   urgency_level?: string;
   reporter_id?: string;
   search?: string;
+  sort?: string;
   page?: number;
   limit?: number;
 }

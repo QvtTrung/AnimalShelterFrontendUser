@@ -37,7 +37,7 @@ export const ReportPage = () => {
     location: "",
     coordinates: {
       type: "Point" as const,
-      coordinates: [105.8542, 21.0285] as [number, number], // Default: Hanoi [lng, lat]
+      coordinates: [105.7829, 10.0452] as [number, number], // Default: Can Tho [lng, lat]
     },
     contact_name: "",
     contact_phone: "",

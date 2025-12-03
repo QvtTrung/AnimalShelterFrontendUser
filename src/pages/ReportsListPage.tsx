@@ -39,6 +39,7 @@ export const ReportsPage = () => {
     urgency_level: urgencyFilter || undefined,
     status: statusFilter || undefined,
     search: searchQuery || undefined,
+    sort: sortBy,
     page,
     limit,
   });
@@ -96,14 +97,8 @@ export const ReportsPage = () => {
     });
   }
 
-  // Apply client-side sorting by date_created
-  if (reports.length > 0) {
-    reports = [...reports].sort((a, b) => {
-      const dateA = a.date_created ? new Date(a.date_created).getTime() : 0;
-      const dateB = b.date_created ? new Date(b.date_created).getTime() : 0;
-      return sortBy === "newest" ? dateB - dateA : dateA - dateB;
-    });
-  }
+  // Backend now handles sorting, so we don't need client-side sorting
+  // Note: Client-side sorting would only sort the current page, not all reports
 
   const total = reportsData?.meta?.total || 0;
   const totalPages = Math.ceil(total / limit);
@@ -219,7 +214,10 @@ export const ReportsPage = () => {
             <Select
               label="Sort"
               selectedKeys={[sortBy]}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={(e) => {
+                setSortBy(e.target.value);
+                setPage(1); // Reset to first page when changing sort
+              }}
               size="sm"
               aria-label="Sort by date"
               className="w-36"

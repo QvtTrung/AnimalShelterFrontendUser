@@ -61,8 +61,13 @@ class ApiClient {
                 refresh_token: refreshToken,
               });
 
-              const { token } = response.data.data;
+              const { token, refresh_token } = response.data.data;
               localStorage.setItem('token', token);
+              
+              // Store the new refresh token if provided
+              if (refresh_token) {
+                localStorage.setItem('refresh_token', refresh_token);
+              }
 
               originalRequest.headers.Authorization = `Bearer ${token}`;
               return this.instance(originalRequest);

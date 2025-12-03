@@ -33,7 +33,7 @@ export const Chatbot = () => {
           {
             role: "assistant",
             content:
-              "👋 Hi! I can help you adopt a pet or guide you in rescuing animals. What can I help you with?",
+              "👋 Xin chào! Mình có thể giúp bạn nhận nuôi thú cưng hoặc hướng dẫn cứu hộ động vật. Mình có thể giúp gì cho bạn?",
             timestamp: new Date(),
           },
         ]);
@@ -75,7 +75,7 @@ export const Chatbot = () => {
             const errorMessage: ChatMessage = {
               role: "assistant",
               content:
-                "I'm having trouble responding right now. Please try again.",
+                "Mình đang gặp chút trục trặc. Bạn thử lại sau giây lát nhé.",
               timestamp: new Date(),
             };
             setMessages((prev) => [...prev, errorMessage]);
