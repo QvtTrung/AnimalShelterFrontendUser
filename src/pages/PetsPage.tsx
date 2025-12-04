@@ -40,23 +40,23 @@ export const PetsPage = () => {
   });
 
   const species = [
-    { label: "Dog", value: "dog" },
-    { label: "Cat", value: "cat" },
-    { label: "Bird", value: "bird" },
-    { label: "Other", value: "other" },
+    { label: "Chó", value: "dog" },
+    { label: "Mèo", value: "cat" },
+    { label: "Chim", value: "bird" },
+    { label: "Khác", value: "other" },
   ];
 
   const statuses = [
-    { label: "All Status", value: "" },
-    { label: "Available", value: "available" },
-    { label: "Adopted", value: "adopted" },
-    { label: "Pending", value: "pending" },
+    { label: "Tất cả trạng thái", value: "" },
+    { label: "Còn trống", value: "available" },
+    { label: "Đã nhận nuôi", value: "adopted" },
+    { label: "Chờ duyệt", value: "pending" },
   ];
 
   const sizes = [
-    { label: "Small", value: "small" },
-    { label: "Medium", value: "medium" },
-    { label: "Large", value: "large" },
+    { label: "Nhỏ", value: "small" },
+    { label: "Trung bình", value: "medium" },
+    { label: "Lớn", value: "large" },
   ];
 
   // API response structure: { status: 'success', message: string, data: Pet[], meta: { total: number } }
@@ -98,16 +98,16 @@ export const PetsPage = () => {
             <div className="flex items-center justify-center gap-2 mb-2">
               <PawPrint className="w-8 h-8" />
               <span className="text-sm font-semibold tracking-wide uppercase">
-                ADOPT
+                NHẬN NUÔI
               </span>
             </div>
             <h1 className="text-4xl md:text-5xl font-heading font-bold">
-              Find a New Friend
+              Tìm Người Bạn Mới
             </h1>
             <p className="text-lg text-primary-50 max-w-3xl mx-auto">
-              Browse our rescued animals waiting for their forever home. Every
-              pet deserves a loving family, and you could be the one to make a
-              difference.
+              Duyệt qua các động vật được cứu trợ đang chờ một ngôi nhà mãi mãi.
+              Mọi thú cưng đều xứng đáng có một gia đình yêu thương, và bạn có
+              thể là người tạo nên sự khác biệt.
             </p>
           </div>
         </div>
@@ -118,7 +118,7 @@ export const PetsPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <Input
-              placeholder="Search pets by name..."
+              placeholder="Tìm kiếm thú cưng theo tên..."
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -133,14 +133,14 @@ export const PetsPage = () => {
               }}
             />
             <Select
-              placeholder="All Species"
+              placeholder="Tất cả loài"
               selectedKeys={speciesFilter ? [speciesFilter] : []}
               onChange={(e) => {
                 setSpeciesFilter(e.target.value);
                 setPage(1);
               }}
               size="lg"
-              aria-label="Filter by species"
+              aria-label="Lọc theo loài"
               classNames={{
                 trigger: "bg-gray-50",
               }}
@@ -152,14 +152,14 @@ export const PetsPage = () => {
               ))}
             </Select>
             <Select
-              placeholder="All Sizes"
+              placeholder="Tất cả kích cỡ"
               selectedKeys={sizeFilter ? [sizeFilter] : []}
               onChange={(e) => {
                 setSizeFilter(e.target.value);
                 setPage(1);
               }}
               size="lg"
-              aria-label="Filter by size"
+              aria-label="Lọc theo kích cỡ"
               classNames={{
                 trigger: "bg-gray-50",
               }}
@@ -171,14 +171,14 @@ export const PetsPage = () => {
               ))}
             </Select>
             <Select
-              placeholder="All Status"
+              placeholder="Tất cả trạng thái"
               selectedKeys={statusFilter ? [statusFilter] : []}
               onChange={(e) => {
                 setStatusFilter(e.target.value);
                 setPage(1);
               }}
               size="lg"
-              aria-label="Filter by status"
+              aria-label="Lọc theo trạng thái"
               classNames={{
                 trigger: "bg-gray-50",
               }}
@@ -190,20 +190,20 @@ export const PetsPage = () => {
               ))}
             </Select>
             <Select
-              placeholder="Sort by Date"
+              placeholder="Sắp xếp theo ngày"
               selectedKeys={[sortBy]}
               onChange={(e) => setSortBy(e.target.value)}
               size="lg"
-              aria-label="Sort by date"
+              aria-label="Sắp xếp theo ngày"
               classNames={{
                 trigger: "bg-gray-50",
               }}
             >
               <SelectItem key="newest" value="newest">
-                Newest First
+                Mới nhất
               </SelectItem>
               <SelectItem key="oldest" value="oldest">
-                Oldest First
+                Cũ nhất
               </SelectItem>
             </Select>
           </div>
@@ -222,7 +222,7 @@ export const PetsPage = () => {
           {isError && (
             <div className="text-center py-20">
               <p className="text-red-500 text-lg">
-                Failed to load pets. Please try again later.
+                Tải thú cưng thất bại. Vui lòng thử lại sau.
               </p>
             </div>
           )}
@@ -230,7 +230,7 @@ export const PetsPage = () => {
           {!isLoading && !isError && pets?.length === 0 && (
             <div className="text-center py-20">
               <p className="text-gray-500 text-lg">
-                No pets found matching your criteria.
+                Không tìm thấy thú cưng nào phù hợp.
               </p>
             </div>
           )}
@@ -265,7 +265,7 @@ export const PetsPage = () => {
                         {pet.name}
                       </h3>
                       <p className="text-sm text-gray-500 capitalize">
-                        {pet.species} • {pet.breed || "Mixed"}
+                        {pet.species}
                       </p>
                     </div>
                     <Button
@@ -279,7 +279,7 @@ export const PetsPage = () => {
                   </div>
 
                   <p className="text-gray-600 text-sm line-clamp-2">
-                    {pet.description || "No description available."}
+                    {pet.description || "Không có mô tả."}
                   </p>
 
                   <div className="flex flex-wrap gap-2">
@@ -289,7 +289,12 @@ export const PetsPage = () => {
                         variant="flat"
                         startContent={<Calendar className="w-3 h-3" />}
                       >
-                        {pet.age} {pet.age_unit || "years"}
+                        {pet.age}{" "}
+                        {pet.age_unit === "years"
+                          ? "tuổi"
+                          : pet.age_unit === "months"
+                          ? "tháng"
+                          : pet.age_unit}
                       </Chip>
                     )}
                     {pet.location && (
@@ -311,7 +316,7 @@ export const PetsPage = () => {
                     className="w-full font-semibold"
                     size="lg"
                   >
-                    View Details
+                    Xem Chi Tiết
                   </Button>
                 </CardFooter>
               </Card>
@@ -331,8 +336,8 @@ export const PetsPage = () => {
               />
               {total > 0 && (
                 <p className="text-gray-500 text-sm">
-                  Showing {(page - 1) * limit + 1}-
-                  {Math.min(page * limit, total)} of {total} pets
+                  Hiển thị {(page - 1) * limit + 1}-
+                  {Math.min(page * limit, total)} trong số {total} thú cưng
                 </p>
               )}
             </div>

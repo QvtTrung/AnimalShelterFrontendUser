@@ -28,21 +28,21 @@ export const Header = () => {
   const navigate = useNavigate();
 
   const menuItems = [
-    { label: "Home", path: "/" },
-    { label: "Adopt a Pet", path: "/pets" },
-    { label: "Report Animal", path: "/report" },
-    { label: "View Reports", path: "/reports" },
-    { label: "Rescues", path: "/rescues" },
+    { label: "Trang Chủ", path: "/" },
+    { label: "Nhận Nuôi", path: "/pets" },
+    { label: "Đăng tin", path: "/report" },
+    { label: "Báo Cáo", path: "/reports" },
+    { label: "Cứu Hộ", path: "/rescues" },
   ];
 
   const handleLogout = async () => {
     try {
       await logout.mutateAsync();
-      toast.success("Logged out successfully!");
+      toast.success("Đăng xuất thành công!");
       navigate("/login");
     } catch (error) {
       console.error("Logout error:", error);
-      toast.error("Logout failed. Please try again.");
+      toast.error("Đăng xuất thất bại. Vui lòng thử lại.");
     }
   };
 
@@ -63,7 +63,7 @@ export const Header = () => {
     >
       <NavbarContent>
         <NavbarMenuToggle
-          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          aria-label={isMenuOpen ? "Đóng menu" : "Mở menu"}
           className="sm:hidden"
         />
         <NavbarBrand>
@@ -116,35 +116,35 @@ export const Header = () => {
                   <DropdownItem
                     key="profile"
                     className="h-14 gap-2"
-                    textValue="Profile Info"
+                    textValue="Thông tin tài khoản"
                   >
-                    <p className="font-semibold">Signed in as</p>
+                    <p className="font-semibold">Đã đăng nhập với</p>
                     <p className="font-semibold">{user.email}</p>
                   </DropdownItem>
                   <DropdownItem
                     key="dashboard"
                     startContent={<LayoutDashboard className="w-4 h-4" />}
-                    textValue="My Dashboard"
+                    textValue="Bảng điều khiển"
                     onPress={() => navigate("/dashboard")}
                   >
-                    My Dashboard
+                    Bảng Điều Khiển
                   </DropdownItem>
                   <DropdownItem
                     key="profile-settings"
                     startContent={<UserIcon className="w-4 h-4" />}
-                    textValue="Profile Settings"
+                    textValue="Cài đặt hồ sơ"
                     onPress={() => navigate("/profile")}
                   >
-                    Profile Settings
+                    Cài Đặt Hồ Sơ
                   </DropdownItem>
                   <DropdownItem
                     key="logout"
                     color="danger"
                     startContent={<LogOut className="w-4 h-4" />}
-                    textValue="Log Out"
+                    textValue="Đăng xuất"
                     onPress={handleLogout}
                   >
-                    Log Out
+                    Đăng Xuất
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
@@ -163,7 +163,7 @@ export const Header = () => {
                 className="font-bold text-base px-4 min-w-20"
                 size="md"
               >
-                Login
+                Đăng Nhập
               </Button>
             </NavbarItem>
             <NavbarItem>
@@ -175,7 +175,7 @@ export const Header = () => {
                 className="font-bold text-base px-4 min-w-[90px]"
                 size="md"
               >
-                Sign Up
+                Đăng Ký
               </Button>
             </NavbarItem>
           </div>
@@ -202,7 +202,7 @@ export const Header = () => {
                 to="/login"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Login
+                Đăng Nhập
               </Link>
             </NavbarMenuItem>
             <NavbarMenuItem>
@@ -211,7 +211,7 @@ export const Header = () => {
                 to="/register"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Sign Up
+                Đăng Ký
               </Link>
             </NavbarMenuItem>
           </>

@@ -57,11 +57,13 @@ export const PetDetailPage = () => {
       });
       onOpenChange();
       // Show success message
-      alert("Adoption request submitted successfully! We'll contact you soon.");
+      alert(
+        "Đơn xin nhận nuôi đã gửi thành công! Chúng tôi sẽ liên hệ với bạn sớm."
+      );
       navigate("/dashboard");
     } catch (error) {
       console.error("Failed to submit adoption:", error);
-      alert("Failed to submit adoption request. Please try again.");
+      alert("Gửi đơn xin nhận nuôi thất bại. Vui lòng thử lại.");
     }
   };
 
@@ -80,10 +82,10 @@ export const PetDetailPage = () => {
           <CardBody className="text-center py-12">
             <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Pet Not Found
+              Không Tìm Thấy Thú Cưng
             </h2>
             <p className="text-gray-600 mb-6">
-              The pet you're looking for doesn't exist or has been removed.
+              Thú cưng bạn đang tìm không tồn tại hoặc đã bị xóa.
             </p>
             <Button
               as={Link}
@@ -92,7 +94,7 @@ export const PetDetailPage = () => {
               variant="flat"
               startContent={<ArrowLeft className="w-4 h-4" />}
             >
-              Back to Pets
+              Quay Lại Danh Sách Thú Cưng
             </Button>
           </CardBody>
         </Card>
@@ -111,7 +113,7 @@ export const PetDetailPage = () => {
             variant="light"
             startContent={<ArrowLeft className="w-4 h-4" />}
           >
-            Back to Pets
+            Quay Lại Danh Sách Thú Cưng
           </Button>
         </div>
       </div>
@@ -174,7 +176,7 @@ export const PetDetailPage = () => {
                     {pet.name}
                   </h1>
                   <p className="text-xl text-gray-600 capitalize">
-                    {pet.species} • {pet.breed || "Mixed Breed"}
+                    {pet.species}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -195,7 +197,12 @@ export const PetDetailPage = () => {
                     variant="flat"
                     startContent={<Calendar className="w-4 h-4" />}
                   >
-                    {pet.age} {pet.age_unit || "years"} old
+                    {pet.age}{" "}
+                    {pet.age_unit === "years"
+                      ? "tuổi"
+                      : pet.age_unit === "months"
+                      ? "tháng"
+                      : pet.age_unit}
                   </Chip>
                 )}
                 {pet.size && (
@@ -224,11 +231,11 @@ export const PetDetailPage = () => {
             <Card>
               <CardBody className="p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-3">
-                  About {pet.name}
+                  Về {pet.name}
                 </h2>
                 <p className="text-gray-600 leading-relaxed">
                   {pet.description ||
-                    `${pet.name} is a wonderful ${pet.species} looking for a loving home. This adorable companion is waiting to bring joy to your family!`}
+                    `${pet.name} là một ${pet.species} tuyệt vời đang tìm kiếm một ngôi nhà ấm áp. Người bạn đáng yêu này đang chờ để mang niềm vui đến gia đình bạn!`}
                 </p>
               </CardBody>
             </Card>
@@ -238,7 +245,7 @@ export const PetDetailPage = () => {
               <Card>
                 <CardBody className="p-6">
                   <h2 className="text-xl font-bold text-gray-900 mb-3">
-                    Medical Information
+                    Thông Tin Y Tế
                   </h2>
                   <div className="space-y-2">
                     {pet.vaccination_status && (
@@ -247,7 +254,7 @@ export const PetDetailPage = () => {
                           ✓
                         </Chip>
                         <span className="text-gray-700">
-                          Vaccination: {pet.vaccination_status}
+                          Tiêm chủng: {pet.vaccination_status}
                         </span>
                       </div>
                     )}
@@ -270,14 +277,14 @@ export const PetDetailPage = () => {
                 onPress={handleAdoptClick}
                 isLoading={createAdoption.isPending}
               >
-                Adopt {pet.name}
+                Nhận Nuôi {pet.name}
               </Button>
             )}
 
             {pet.status === "adopted" && (
               <div className="bg-gray-100 rounded-lg p-6 text-center">
                 <p className="text-gray-600 font-medium">
-                  {pet.name} has already been adopted and found a loving home!
+                  {pet.name} đã được nhận nuôi và tìm được một ngôi nhà ấm áp!
                   ❤️
                 </p>
               </div>
@@ -286,7 +293,7 @@ export const PetDetailPage = () => {
             {pet.status === "pending" && (
               <div className="bg-yellow-50 rounded-lg p-6 text-center">
                 <p className="text-yellow-800 font-medium">
-                  {pet.name} has a pending adoption application.
+                  {pet.name} có đơn xin nhận nuôi đang chờ duyệt.
                 </p>
               </div>
             )}
@@ -300,24 +307,24 @@ export const PetDetailPage = () => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                <h2 className="text-2xl font-bold">Adopt {pet.name}</h2>
+                <h2 className="text-2xl font-bold">Nhận Nuôi {pet.name}</h2>
                 <p className="text-sm text-gray-600 font-normal">
-                  Fill out this form to start the adoption process
+                  Điền vào biểu mẫu này để bắt đầu quá trình nhận nuôi
                 </p>
               </ModalHeader>
               <ModalBody>
                 <div className="space-y-4">
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p className="text-sm text-blue-800">
-                      <strong>Next Steps:</strong> After submitting, our team
-                      will review your application and contact you within 2-3
-                      business days to discuss the adoption process.
+                      <strong>Các bước tiếp theo:</strong> Sau khi gửi, nhóm của
+                      chúng tôi sẽ xem xét đơn của bạn và liên hệ trong vòng 2-3
+                      ngày làm việc để thảo luận về quá trình nhận nuôi.
                     </p>
                   </div>
 
                   <Textarea
-                    label="Additional Notes (Optional)"
-                    placeholder="Tell us about your home, experience with pets, or any questions you have..."
+                    label="Ghi Chú Thêm (Tùy chọn)"
+                    placeholder="Nói cho chúng tôi về ngôi nhà của bạn, kinh nghiệm với thú cưng, hoặc bất kỳ câu hỏi nào bạn có..."
                     value={adoptionNotes}
                     onChange={(e) => setAdoptionNotes(e.target.value)}
                     minRows={4}
@@ -326,7 +333,7 @@ export const PetDetailPage = () => {
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={onClose}>
-                  Cancel
+                  Hủy
                 </Button>
                 <Button
                   color="primary"
@@ -334,7 +341,7 @@ export const PetDetailPage = () => {
                   isLoading={createAdoption.isPending}
                   className="font-semibold"
                 >
-                  Submit Adoption Request
+                  Gửi Đơn Xin Nhận Nuôi
                 </Button>
               </ModalFooter>
             </>

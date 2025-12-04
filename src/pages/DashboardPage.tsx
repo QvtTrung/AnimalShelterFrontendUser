@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Card,
   CardBody,
@@ -29,7 +29,7 @@ import { useMyAdoptions } from "../hooks/useAdoptions";
 import { useMyReports } from "../hooks/useReports";
 import { useMyRescues } from "../hooks/useRescues";
 import { useDashboardStats, useNearbyReports } from "../hooks/useDashboard";
-import type { Adoption, Report, Rescue } from "../types";
+import type { Adoption, Report, Rescue, Pet } from "../types";
 
 export const DashboardPage = () => {
   const [selectedTab, setSelectedTab] = useState("adoptions");
@@ -103,11 +103,23 @@ export const DashboardPage = () => {
   const { data: nearbyReportsData, isLoading: nearbyLoading } =
     useNearbyReports(userLocation, searchRadius, locationEnabled);
 
-  // Extract data from API responses
-  const adoptionsData = adoptionsResponse?.data || [];
-  const reportsData = reportsResponse?.data || [];
-  const rescuesData = rescuesResponse?.data || [];
-  const nearbyReports = nearbyReportsData || [];
+  // Extract data from API responses - use useMemo to prevent recreating arrays on every render
+  const adoptionsData = useMemo(
+    () => adoptionsResponse?.data || [],
+    [adoptionsResponse?.data]
+  );
+  const reportsData = useMemo(
+    () => reportsResponse?.data || [],
+    [reportsResponse?.data]
+  );
+  const rescuesData = useMemo(
+    () => rescuesResponse?.data || [],
+    [rescuesResponse?.data]
+  );
+  const nearbyReports = useMemo(
+    () => nearbyReportsData || [],
+    [nearbyReportsData]
+  );
 
   // Debug: Log first adoption to check data structure
   useEffect(() => {
@@ -115,7 +127,7 @@ export const DashboardPage = () => {
       console.log("First adoption data:", adoptionsData[0]);
       console.log("Pet data:", adoptionsData[0].pet_id);
       if (typeof adoptionsData[0].pet_id === "object") {
-        console.log("Pet images:", (adoptionsData[0].pet_id as any).pet_images);
+        console.log("Pet images:", (adoptionsData[0].pet_id as Pet).pet_images);
       }
     }
   }, [adoptionsData]);
@@ -200,10 +212,10 @@ export const DashboardPage = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-heading font-bold text-gray-900">
-            My Dashboard
+            Bảng Điều Khiển
           </h1>
           <p className="text-gray-600 mt-2">
-            Track your adoptions, reports, and rescue campaigns
+            Theo dõi đơn nhận nuôi, báo cáo và chiến dịch cứu hộ của bạn
           </p>
         </div>
 
@@ -215,7 +227,7 @@ export const DashboardPage = () => {
                 <PawPrint className="w-6 h-6 text-green-600" />
               </div>
               <div className="flex-1">
-                <p className="text-sm text-gray-600">My Adoptions</p>
+                <p className="text-sm text-gray-600">Đơn Nhận Nuôi Của Tôi</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {adoptionsData.length}
                 </p>
@@ -225,10 +237,10 @@ export const DashboardPage = () => {
                   stats && (
                     <div className="flex gap-2 mt-1">
                       <Chip size="sm" color="warning" variant="flat">
-                        {stats.adoptions.pending} pending
+                        {stats.adoptions.pending} chờ duyệt
                       </Chip>
                       <Chip size="sm" color="success" variant="flat">
-                        {stats.adoptions.approved} approved
+                        {stats.adoptions.approved} đã chấp nhận
                       </Chip>
                     </div>
                   )
@@ -243,7 +255,7 @@ export const DashboardPage = () => {
                 <AlertTriangle className="w-6 h-6 text-orange-600" />
               </div>
               <div className="flex-1">
-                <p className="text-sm text-gray-600">My Reports</p>
+                <p className="text-sm text-gray-600">Báo Cáo Của Tôi</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {reportsData.length}
                 </p>
@@ -253,10 +265,10 @@ export const DashboardPage = () => {
                   stats && (
                     <div className="flex gap-2 mt-1">
                       <Chip size="sm" color="warning" variant="flat">
-                        {stats.reports.pending} pending
+                        {stats.reports.pending} chờ duyệt
                       </Chip>
                       <Chip size="sm" color="success" variant="flat">
-                        {stats.reports.resolved} resolved
+                        {stats.reports.resolved} đã giải quyết
                       </Chip>
                     </div>
                   )
@@ -271,7 +283,7 @@ export const DashboardPage = () => {
                 <Users className="w-6 h-6 text-blue-600" />
               </div>
               <div className="flex-1">
-                <p className="text-sm text-gray-600">My Rescue Campaigns</p>
+                <p className="text-sm text-gray-600">Cứu Hộ Của Tôi</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {rescuesData.length}
                 </p>
@@ -281,10 +293,10 @@ export const DashboardPage = () => {
                   stats && (
                     <div className="flex gap-2 mt-1">
                       <Chip size="sm" color="primary" variant="flat">
-                        {stats.rescues.in_progress} active
+                        {stats.rescues.in_progress} đang hoạt động
                       </Chip>
                       <Chip size="sm" color="success" variant="flat">
-                        {stats.rescues.completed} completed
+                        {stats.rescues.completed} hoàn thành
                       </Chip>
                     </div>
                   )
@@ -309,7 +321,7 @@ export const DashboardPage = () => {
               }}
             >
               {/* Adoptions Tab */}
-              <Tab key="adoptions" title="My Adoptions">
+              <Tab key="adoptions" title="Đơn Nhận Nuôi Của Tôi">
                 {adoptionsLoading ? (
                   <div className="flex justify-center py-12">
                     <Spinner size="lg" color="primary" />
@@ -319,8 +331,8 @@ export const DashboardPage = () => {
                     <PawPrint className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-500 mb-4">
                       {adoptionsStatusFilter
-                        ? `No adoptions with status "${adoptionsStatusFilter}"`
-                        : "You haven't applied for any adoptions yet."}
+                        ? `Không có đơn nhận nuôi với trạng thái "${adoptionsStatusFilter}"`
+                        : "Bạn chưa nộp đơn nhận nuôi nào."}
                     </p>
                     {!adoptionsStatusFilter && (
                       <Button
@@ -329,7 +341,7 @@ export const DashboardPage = () => {
                         color="primary"
                         className="font-semibold"
                       >
-                        Browse Pets
+                        Xem Thú Cưng
                       </Button>
                     )}
                   </div>
@@ -338,8 +350,8 @@ export const DashboardPage = () => {
                     {/* Filter */}
                     <div className="flex justify-between items-center">
                       <Select
-                        label="Filter by status"
-                        placeholder="All statuses"
+                        label="Lọc theo trạng thái"
+                        placeholder="Tất cả trạng thái"
                         className="max-w-xs"
                         selectedKeys={
                           adoptionsStatusFilter ? [adoptionsStatusFilter] : []
@@ -350,30 +362,30 @@ export const DashboardPage = () => {
                         }}
                       >
                         <SelectItem key="" value="">
-                          All statuses
+                          Tất cả trạng thái
                         </SelectItem>
                         <SelectItem key="pending" value="pending">
-                          Pending
+                          Chờ Duyệt
                         </SelectItem>
                         <SelectItem key="confirming" value="confirming">
-                          Confirming
+                          Đang Xác Nhận
                         </SelectItem>
                         <SelectItem key="confirmed" value="confirmed">
-                          Confirmed
+                          Đã Xác Nhận
                         </SelectItem>
                         <SelectItem key="approved" value="approved">
-                          Approved
+                          Đã Chấp Nhận
                         </SelectItem>
                         <SelectItem key="completed" value="completed">
-                          Completed
+                          Hoàn Thành
                         </SelectItem>
                         <SelectItem key="cancelled" value="cancelled">
-                          Cancelled
+                          Đã Hủy
                         </SelectItem>
                       </Select>
                       <p className="text-sm text-gray-500">
-                        Showing {paginatedAdoptions.length} of{" "}
-                        {filteredAdoptions.length} adoptions
+                        Hiển thị {paginatedAdoptions.length} trong số{" "}
+                        {filteredAdoptions.length} đơn nhận nuôi
                       </p>
                     </div>
 
@@ -418,14 +430,16 @@ export const DashboardPage = () => {
 
                               {adoption.notes && (
                                 <p className="text-sm text-gray-600">
-                                  <span className="font-semibold">Notes:</span>{" "}
+                                  <span className="font-semibold">
+                                    Ghi chú:
+                                  </span>{" "}
                                   {adoption.notes}
                                 </p>
                               )}
 
                               <div className="flex items-center gap-2 text-sm text-gray-500">
                                 <Calendar className="w-4 h-4" />
-                                Applied on{" "}
+                                Nộp đơn ngày{" "}
                                 {new Date(
                                   adoption.date_created
                                 ).toLocaleDateString()}
@@ -442,7 +456,7 @@ export const DashboardPage = () => {
                                   variant="flat"
                                   className="font-semibold"
                                 >
-                                  View Pet Details
+                                  Xem Chi Tiết Thú Cưng
                                 </Button>
                               </div>
                             </div>
@@ -468,7 +482,7 @@ export const DashboardPage = () => {
               </Tab>
 
               {/* Reports Tab */}
-              <Tab key="reports" title="My Reports">
+              <Tab key="reports" title="Báo Cáo Của Tôi">
                 {reportsLoading ? (
                   <div className="flex justify-center py-12">
                     <Spinner size="lg" color="primary" />
@@ -478,8 +492,8 @@ export const DashboardPage = () => {
                     <AlertTriangle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-500 mb-4">
                       {reportsStatusFilter
-                        ? `No reports with status "${reportsStatusFilter}"`
-                        : "You haven't submitted any reports yet."}
+                        ? `Không có báo cáo với trạng thái "${reportsStatusFilter}"`
+                        : "Bạn chưa gửi báo cáo nào."}
                     </p>
                     {!reportsStatusFilter && (
                       <Button
@@ -488,7 +502,7 @@ export const DashboardPage = () => {
                         color="primary"
                         className="font-semibold"
                       >
-                        Report Animal
+                        Báo Cáo Động Vật
                       </Button>
                     )}
                   </div>
@@ -497,8 +511,8 @@ export const DashboardPage = () => {
                     {/* Filter */}
                     <div className="flex justify-between items-center">
                       <Select
-                        label="Filter by status"
-                        placeholder="All statuses"
+                        label="Lọc theo trạng thái"
+                        placeholder="Tất cả trạng thái"
                         className="max-w-xs"
                         selectedKeys={
                           reportsStatusFilter ? [reportsStatusFilter] : []
@@ -509,21 +523,21 @@ export const DashboardPage = () => {
                         }}
                       >
                         <SelectItem key="" value="">
-                          All statuses
+                          Tất cả trạng thái
                         </SelectItem>
                         <SelectItem key="pending" value="pending">
-                          Pending
+                          Chờ Duyệt
                         </SelectItem>
                         <SelectItem key="assigned" value="assigned">
-                          Assigned
+                          Đã Phân Công
                         </SelectItem>
                         <SelectItem key="resolved" value="resolved">
-                          Resolved
+                          Đã Giải Quyết
                         </SelectItem>
                       </Select>
                       <p className="text-sm text-gray-500">
-                        Showing {paginatedReports.length} of{" "}
-                        {filteredReports.length} reports
+                        Hiển thị {paginatedReports.length} trong số{" "}
+                        {filteredReports.length} báo cáo
                       </p>
                     </div>
 
@@ -579,7 +593,7 @@ export const DashboardPage = () => {
 
                             <div className="flex items-center gap-2 text-sm text-gray-500">
                               <Calendar className="w-4 h-4" />
-                              Reported on{" "}
+                              Báo cáo ngày{" "}
                               {new Date(
                                 report.date_created
                               ).toLocaleDateString()}
@@ -594,7 +608,7 @@ export const DashboardPage = () => {
                                 variant="flat"
                                 className="font-semibold"
                               >
-                                View Details
+                                Xem Chi Tiết
                               </Button>
                               {report.status === "assigned" && (
                                 <Button
@@ -605,7 +619,7 @@ export const DashboardPage = () => {
                                   variant="flat"
                                   className="font-semibold"
                                 >
-                                  View Rescue Campaign
+                                  Xem Chiến Dịch Cứu Hộ
                                 </Button>
                               )}
                             </div>
@@ -631,7 +645,7 @@ export const DashboardPage = () => {
               </Tab>
 
               {/* Rescue Campaigns Tab */}
-              <Tab key="rescues" title="My Rescues">
+              <Tab key="rescues" title="Cứu Hộ Của Tôi">
                 {rescuesLoading ? (
                   <div className="flex justify-center py-12">
                     <Spinner size="lg" color="primary" />
@@ -641,8 +655,8 @@ export const DashboardPage = () => {
                     <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-500 mb-4">
                       {rescuesStatusFilter
-                        ? `No rescues with status "${rescuesStatusFilter}"`
-                        : "You're not participating in any rescue campaigns yet."}
+                        ? `Không có cứu hộ với trạng thái "${rescuesStatusFilter}"`
+                        : "Bạn chưa tham gia chiến dịch cứu hộ nào."}
                     </p>
                     {!rescuesStatusFilter && (
                       <Button
@@ -651,7 +665,7 @@ export const DashboardPage = () => {
                         color="primary"
                         className="font-semibold"
                       >
-                        Browse Campaigns
+                        Xem Chiến Dịch
                       </Button>
                     )}
                   </div>
@@ -660,8 +674,8 @@ export const DashboardPage = () => {
                     {/* Filter */}
                     <div className="flex justify-between items-center">
                       <Select
-                        label="Filter by status"
-                        placeholder="All statuses"
+                        label="Lọc theo trạng thái"
+                        placeholder="Tất cả trạng thái"
                         className="max-w-xs"
                         selectedKeys={
                           rescuesStatusFilter ? [rescuesStatusFilter] : []
@@ -672,24 +686,24 @@ export const DashboardPage = () => {
                         }}
                       >
                         <SelectItem key="" value="">
-                          All statuses
+                          Tất cả trạng thái
                         </SelectItem>
                         <SelectItem key="planned" value="planned">
-                          Planned
+                          Đã Lên Kế Hoạch
                         </SelectItem>
                         <SelectItem key="in_progress" value="in_progress">
-                          In Progress
+                          Đang Thực Hiện
                         </SelectItem>
                         <SelectItem key="completed" value="completed">
-                          Completed
+                          Hoàn Thành
                         </SelectItem>
                         <SelectItem key="cancelled" value="cancelled">
-                          Cancelled
+                          Đã Hủy
                         </SelectItem>
                       </Select>
                       <p className="text-sm text-gray-500">
-                        Showing {paginatedRescues.length} of{" "}
-                        {filteredRescues.length} rescues
+                        Hiển thị {paginatedRescues.length} trong số{" "}
+                        {filteredRescues.length} cứu hộ
                       </p>
                     </div>
 
@@ -735,8 +749,7 @@ export const DashboardPage = () => {
                               {rescue.participants && (
                                 <div className="flex items-center gap-2">
                                   <Users className="w-4 h-4" />
-                                  {rescue.participants.length} participant
-                                  {rescue.participants.length !== 1 ? "s" : ""}
+                                  {rescue.participants.length} người tham gia
                                 </div>
                               )}
                             </div>
@@ -749,7 +762,7 @@ export const DashboardPage = () => {
                                 size="sm"
                                 className="font-semibold"
                               >
-                                View Campaign
+                                Xem Chiến Dịch
                               </Button>
                             </div>
                           </div>
@@ -779,7 +792,7 @@ export const DashboardPage = () => {
                 title={
                   <div className="flex items-center gap-2">
                     <Navigation className="w-4 h-4" />
-                    Nearby Reports
+                    Báo Cáo Gần Đây
                   </div>
                 }
               >
@@ -792,10 +805,10 @@ export const DashboardPage = () => {
                           <div>
                             <h4 className="font-semibold text-gray-900 flex items-center gap-2">
                               <Navigation className="w-5 h-5 text-primary-600" />
-                              Enable Location
+                              Bật Vị Trí
                             </h4>
                             <p className="text-sm text-gray-600 mt-1">
-                              Share your location to find nearby animal reports
+                              Chia sẻ vị trí để tìm báo cáo động vật gần bạn
                             </p>
                           </div>
                           <Switch
@@ -809,14 +822,14 @@ export const DashboardPage = () => {
                           <div className="space-y-3">
                             <div className="flex items-center gap-2 text-sm text-success-600">
                               <CheckCircle className="w-4 h-4" />
-                              Location detected:{" "}
+                              Đã phát hiện vị trí:{" "}
                               {userLocation.latitude.toFixed(4)},{" "}
                               {userLocation.longitude.toFixed(4)}
                             </div>
 
                             <div>
                               <label className="text-sm font-semibold text-gray-700 mb-2 block">
-                                Search Radius:{" "}
+                                Bán Kính Tìm Kiếm:{" "}
                                 {(searchRadius / 1000).toFixed(0)} km
                               </label>
                               <Slider
@@ -842,7 +855,7 @@ export const DashboardPage = () => {
                         {locationEnabled && !userLocation && (
                           <div className="flex items-center gap-2 text-sm text-warning-600">
                             <Clock className="w-4 h-4" />
-                            Requesting location permission...
+                            Đang yêu cầu quyền truy cập vị trí...
                           </div>
                         )}
                       </div>
@@ -854,10 +867,10 @@ export const DashboardPage = () => {
                     <div className="text-center py-12">
                       <Navigation className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                       <p className="text-gray-500 mb-4">
-                        Enable location sharing to see nearby animal reports
+                        Bật chia sẻ vị trí để xem báo cáo động vật gần bạn
                       </p>
                       <p className="text-sm text-gray-400">
-                        Your location will only be used to find reports near you
+                        Vị trí của bạn chỉ được sử dụng để tìm báo cáo gần bạn
                       </p>
                     </div>
                   ) : nearbyLoading ? (
@@ -868,22 +881,21 @@ export const DashboardPage = () => {
                     <div className="text-center py-12">
                       <AlertTriangle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                       <p className="text-gray-500 mb-2">
-                        No reports found within{" "}
+                        Không tìm thấy báo cáo trong vòng{" "}
                         {(searchRadius / 1000).toFixed(0)} km
                       </p>
                       <p className="text-sm text-gray-400">
-                        Try increasing the search radius
+                        Thử tăng bán kính tìm kiếm
                       </p>
                     </div>
                   ) : (
                     <>
                       <div className="flex justify-between items-center">
                         <p className="text-sm text-gray-600">
-                          Found {nearbyReports.length} report
-                          {nearbyReports.length !== 1 ? "s" : ""} nearby
+                          Tìm thấy {nearbyReports.length} báo cáo gần đây
                         </p>
                         <p className="text-sm text-gray-500">
-                          Showing {paginatedNearbyReports.length} of{" "}
+                          Hiển thị {paginatedNearbyReports.length} trong số{" "}
                           {nearbyReports.length}
                         </p>
                       </div>
@@ -919,7 +931,7 @@ export const DashboardPage = () => {
                                           color="primary"
                                           variant="flat"
                                         >
-                                          {report.distance_km} km away
+                                          Cách {report.distance_km} km
                                         </Chip>
                                         <Chip
                                           size="sm"
@@ -978,7 +990,7 @@ export const DashboardPage = () => {
                                   variant="flat"
                                   className="font-semibold"
                                 >
-                                  View Details
+                                  Xem Chi Tiết
                                 </Button>
                               </div>
                             </div>

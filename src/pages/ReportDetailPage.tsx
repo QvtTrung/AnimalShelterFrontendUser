@@ -113,7 +113,7 @@ export const ReportDetailPage = () => {
     if (!id) return;
 
     if (!isAuthenticated) {
-      toast.error("Please login to claim a report");
+      toast.error("Vui lòng đăng nhập để nhận báo cáo");
       onOpenChange();
       navigate("/login", { state: { from: { pathname: `/reports/${id}` } } });
       return;
@@ -121,11 +121,13 @@ export const ReportDetailPage = () => {
 
     try {
       await claimReportMutation.mutateAsync(id);
-      toast.success("Report claimed successfully! Check your dashboard.");
+      toast.success(
+        "Nhận báo cáo thành công! Kiểm tra bảng điều khiển của bạn."
+      );
       onOpenChange();
     } catch (error) {
       console.error("Failed to claim report:", error);
-      toast.error("Failed to claim report. Please try again.");
+      toast.error("Nhận báo cáo thất bại. Vui lòng thử lại.");
     }
   };
 
@@ -144,10 +146,10 @@ export const ReportDetailPage = () => {
           <CardBody className="text-center py-12">
             <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Report Not Found
+              Không Tìm Thấy Báo Cáo
             </h2>
             <p className="text-gray-600 mb-6">
-              The report you're looking for doesn't exist or has been removed.
+              Báo cáo bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
             </p>
             <Button
               as={Link}
@@ -156,7 +158,7 @@ export const ReportDetailPage = () => {
               variant="flat"
               startContent={<ArrowLeft className="w-4 h-4" />}
             >
-              Back to Reports
+              Quay Lại Danh Sách Báo Cáo
             </Button>
           </CardBody>
         </Card>
@@ -176,7 +178,7 @@ export const ReportDetailPage = () => {
             size="lg"
             startContent={<ArrowLeft className="w-5 h-5" />}
           >
-            Back to Reports
+            Quay Lại Danh Sách Báo Cáo
           </Button>
         </div>
       </div>
@@ -286,7 +288,7 @@ export const ReportDetailPage = () => {
                 <CardBody className="p-5">
                   <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
                     <Info className="w-5 h-5 text-primary-500" />
-                    Description
+                    Mô Tả
                   </h2>
                   <p className="text-gray-700 leading-relaxed whitespace-pre-line text-sm">
                     {report.description}
@@ -312,7 +314,7 @@ export const ReportDetailPage = () => {
               <Card className="lg:sticky lg:top-24 shadow-sm">
                 <CardBody className="p-5">
                   <h2 className="text-lg font-bold text-gray-900 mb-4">
-                    Contact Information
+                    Thông Tin Liên Hệ
                   </h2>
                   <div className="space-y-3">
                     {displayName && (
@@ -322,14 +324,14 @@ export const ReportDetailPage = () => {
                         </div>
                         <div className="flex-1">
                           <p className="text-xs text-gray-500 uppercase tracking-wide mb-0.5">
-                            Name
+                            Tên
                           </p>
                           <p className="text-gray-900 font-medium text-sm">
                             {displayName}
                           </p>
                           {reporterInfo && !report?.contact_name && (
                             <p className="text-xs text-gray-400 mt-0.5">
-                              (Reporter)
+                              (Người Báo Cáo)
                             </p>
                           )}
                         </div>
@@ -342,7 +344,7 @@ export const ReportDetailPage = () => {
                         </div>
                         <div className="flex-1">
                           <p className="text-xs text-gray-500 uppercase tracking-wide mb-0.5">
-                            Phone
+                            SĐT
                           </p>
                           <a
                             href={`tel:${displayPhone}`}
@@ -373,7 +375,7 @@ export const ReportDetailPage = () => {
                     )}
                   </div>
 
-                  {/* Claim Button */}
+                  {/* Claim Button - Only show for pending reports */}
                   {report.status === "pending" && (
                     <div className="mt-5 pt-4 border-t border-gray-200">
                       <Button
@@ -388,8 +390,29 @@ export const ReportDetailPage = () => {
                         onPress={onOpen}
                         startContent={<CheckCircle className="w-4 h-4" />}
                       >
-                        Offer Help
+                        Nhận Báo Cáo
                       </Button>
+                    </div>
+                  )}
+
+                  {/* Status Notes for Assigned/Resolved Reports */}
+                  {report.status === "assigned" && (
+                    <div className="mt-5 pt-4 border-t border-gray-200">
+                      <div className="bg-primary-50 rounded-lg p-6 text-center">
+                        <p className="text-primary-800 font-medium">
+                          Báo cáo này đã được nhận và đang được xử lý. 🚑
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {report.status === "resolved" && (
+                    <div className="mt-5 pt-4 border-t border-gray-200">
+                      <div className="bg-green-50 rounded-lg p-6 text-center">
+                        <p className="text-green-800 font-medium">
+                          Báo cáo này đã được giải quyết thành công! ✅
+                        </p>
+                      </div>
                     </div>
                   )}
                 </CardBody>
@@ -405,9 +428,9 @@ export const ReportDetailPage = () => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                <h2 className="text-2xl font-bold">Offer Help</h2>
+                <h2 className="text-2xl font-bold">Nhận Báo Cáo</h2>
                 <p className="text-sm text-gray-600 font-normal">
-                  Commit to helping this animal in need
+                  Cam kết giúp đỡ động vật cần giúp này
                 </p>
               </ModalHeader>
               <ModalBody>
@@ -415,8 +438,8 @@ export const ReportDetailPage = () => {
                   {!isAuthenticated && (
                     <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                       <p className="text-sm text-yellow-800">
-                        You need to be logged in to offer help. Please login or
-                        register first.
+                        Bạn cần đăng nhập để nhận báo cáo. Vui lòng đăng nhập
+                        hoặc đăng ký trước.
                       </p>
                     </div>
                   )}
@@ -424,24 +447,23 @@ export const ReportDetailPage = () => {
                     <>
                       <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                         <p className="text-sm text-blue-800">
-                          <strong>Note:</strong> A rescue campaign will be
-                          created and this report will appear in your dashboard.
-                          Please coordinate with the reporter and take necessary
-                          action.
+                          <strong>Lưu ý:</strong> Một chiến dịch cứu hộ sẽ được
+                          tạo và báo cáo này sẽ xuất hiện trong bảng điều khiển
+                          của bạn. Vui lòng phối hợp với người báo cáo và thực
+                          hiện hành động cần thiết.
                         </p>
                       </div>
                       <div className="space-y-2">
                         <p className="text-gray-700 font-medium">
-                          Report Details:
+                          Chi Tiết Báo Cáo:
                         </p>
                         <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
                           <li className="capitalize">
-                            Urgency: <strong>{report.urgency_level}</strong>
+                            Mức độ khẩn cấp:{" "}
+                            <strong>{report.urgency_level}</strong>
                           </li>
-                          <li>Location: {report.location}</li>
-                          <li className="capitalize">
-                            Species: {report.species}
-                          </li>
+                          <li>Vị trí: {report.location}</li>
+                          <li className="capitalize">Loài: {report.species}</li>
                         </ul>
                       </div>
                     </>
@@ -450,7 +472,7 @@ export const ReportDetailPage = () => {
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={onClose}>
-                  Cancel
+                  Hủy
                 </Button>
                 <Button
                   color="primary"
@@ -459,7 +481,7 @@ export const ReportDetailPage = () => {
                   isDisabled={!isAuthenticated}
                   className="font-semibold"
                 >
-                  {isAuthenticated ? "Offer Help" : "Login Required"}
+                  {isAuthenticated ? "Nhận Báo Cáo" : "Cần Đăng Nhập"}
                 </Button>
               </ModalFooter>
             </>

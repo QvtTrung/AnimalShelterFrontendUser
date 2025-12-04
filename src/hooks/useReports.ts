@@ -87,3 +87,42 @@ export const useMyReports = () => {
     staleTime: 0, // Always refetch on mount to prevent stale data on login/logout
   });
 };
+
+export const useUpdateMyReport = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Report> | FormData }) => {
+      // Check if data is FormData (for multipart/form-data with images)
+      if (data instanceof FormData) {
+        return apiClient.patch<ApiResponse<Report>>(`/reports/me/${id}`, data);
+      }
+
+      // Otherwise, send as JSON
+      return apiClient.patch<ApiResponse<Report>>(`/reports/me/${id}`, data);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['reports'] });
+      queryClient.invalidateQueries({ queryKey: ['report', variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['my-reports'] });
+    },
+  });
+};
+
+export const useUploadReportImages = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, images }: { id: string; images: File[] }) => {
+      const formData = new FormData();
+      images.forEach((image) => {
+        formData.append('images', image);
+      });
+      return apiClient.post<ApiResponse<any>>(`/reports/${id}/images`, formData);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['report', variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['my-reports'] });
+    },
+  });
+};

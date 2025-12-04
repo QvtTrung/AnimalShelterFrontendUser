@@ -27,14 +27,14 @@ export const RegisterPage = () => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      toast.error("Passwords do not match");
+      setError("ẬMật khẩu không khớp");
+      toast.error("ẬMật khẩu không khớp");
       return;
     }
 
     if (formData.password.length < 8) {
-      setError("Password must be at least 8 characters long");
-      toast.error("Password must be at least 8 characters long");
+      setError("ẬMật khẩu phải có ít nhất 8 ký tự");
+      toast.error("ẬMật khẩu phải có ít nhất 8 ký tự");
       return;
     }
 
@@ -46,12 +46,12 @@ export const RegisterPage = () => {
         last_name: formData.last_name,
         phone_number: formData.phone_number || undefined,
       });
-      toast.success("Account created successfully! Welcome!");
+      toast.success("Đăng ký thành công! Chào mừng bạn!");
       navigate("/dashboard");
     } catch (error) {
       console.error("Registration error:", error);
-      setError("Registration failed. Please try again.");
-      toast.error("Registration failed. Please try again.");
+      setError("Đăng ký thất bại. Vui lòng thử lại.");
+      toast.error("Đăng ký thất bại. Vui lòng thử lại.");
     }
   };
 
@@ -60,10 +60,10 @@ export const RegisterPage = () => {
       <Card className="w-full max-w-2xl shadow-2xl border-2 border-white/50 bg-white/95 backdrop-blur-sm">
         <CardHeader className="flex flex-col items-center gap-2 p-8 pb-4 text-center">
           <h1 className="text-3xl font-heading font-bold text-gray-900">
-            Create Account
+            Tạo Tài Khoản
           </h1>
           <p className="text-gray-600 text-base">
-            Join our community and help save lives
+            Tham gia cộng đồng và giúp cứu sống động vật
           </p>
         </CardHeader>
         <CardBody className="p-8 pt-4">
@@ -72,7 +72,7 @@ export const RegisterPage = () => {
               <div className="bg-danger-50 border-2 border-danger-200 rounded-lg p-4 flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-danger-500 shrink-0 mt-0.5" />
                 <p className="text-sm text-danger-700 font-medium">
-                  {error || "Registration failed. Please try again."}
+                  {error || "Đăng ký thất bại. Vui lòng thử lại."}
                 </p>
               </div>
             )}
@@ -80,8 +80,8 @@ export const RegisterPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
                 type="text"
-                label="First Name"
-                placeholder="Enter your first name"
+                label="Tên"
+                placeholder="Nhập tên của bạn"
                 value={formData.first_name}
                 onChange={(e) => handleChange("first_name", e.target.value)}
                 startContent={<User className="w-4 h-4 text-gray-400" />}
@@ -96,8 +96,8 @@ export const RegisterPage = () => {
 
               <Input
                 type="text"
-                label="Last Name"
-                placeholder="Enter your last name"
+                label="Họ"
+                placeholder="Nhập họ của bạn"
                 value={formData.last_name}
                 onChange={(e) => handleChange("last_name", e.target.value)}
                 startContent={<User className="w-4 h-4 text-gray-400" />}
@@ -114,7 +114,7 @@ export const RegisterPage = () => {
             <Input
               type="email"
               label="Email"
-              placeholder="Enter your email"
+              placeholder="Nhập email của bạn"
               value={formData.email}
               onChange={(e) => handleChange("email", e.target.value)}
               startContent={<Mail className="w-4 h-4 text-gray-400" />}
@@ -129,8 +129,8 @@ export const RegisterPage = () => {
 
             <Input
               type="tel"
-              label="Phone Number (Optional)"
-              placeholder="Enter your phone number"
+              label="Số Điện Thoại (Tùy chọn)"
+              placeholder="Nhập số điện thoại của bạn"
               value={formData.phone_number}
               onChange={(e) => handleChange("phone_number", e.target.value)}
               startContent={<Phone className="w-4 h-4 text-gray-400" />}
@@ -144,8 +144,8 @@ export const RegisterPage = () => {
 
             <Input
               type="password"
-              label="Password"
-              placeholder="Create a password (min. 8 characters)"
+              label="Mật Khẩu"
+              placeholder="Tạo mật khẩu (ít nhất 8 ký tự)"
               value={formData.password}
               onChange={(e) => handleChange("password", e.target.value)}
               startContent={<Lock className="w-4 h-4 text-gray-400" />}
@@ -160,8 +160,8 @@ export const RegisterPage = () => {
 
             <Input
               type="password"
-              label="Confirm Password"
-              placeholder="Confirm your password"
+              label="Xác Nhận Mật Khẩu"
+              placeholder="Xác nhận mật khẩu của bạn"
               value={formData.confirmPassword}
               onChange={(e) => handleChange("confirmPassword", e.target.value)}
               startContent={<Lock className="w-4 h-4 text-gray-400" />}
@@ -181,16 +181,16 @@ export const RegisterPage = () => {
               className="w-full font-semibold text-base mt-2"
               isLoading={register.isPending}
             >
-              Create Account
+              Tạo Tài Khoản
             </Button>
 
             <p className="text-center text-gray-600 pt-2">
-              Already have an account?{" "}
+              Đã có tài khoản?{" "}
               <Link
                 to="/login"
                 className="text-primary-600 font-semibold hover:text-primary-700"
               >
-                Sign in
+                Đăng nhập
               </Link>
             </p>
           </form>

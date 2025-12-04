@@ -48,7 +48,7 @@ export interface Report {
   id: string;
   title: string;
   description: string;
-  species: string;
+  species: 'Dog' | 'Cat' | 'Other';
   type: 'abuse' | 'abandonment' | 'injured_animal' | 'other';
   location: string;
   coordinates?: {

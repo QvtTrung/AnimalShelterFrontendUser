@@ -78,7 +78,7 @@ export const NotificationDropdown: React.FC = () => {
       <button
         onClick={handleToggle}
         className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-        aria-label="Notifications"
+        aria-label="Thông báo"
       >
         <svg
           className="w-6 h-6"
@@ -108,26 +108,23 @@ export const NotificationDropdown: React.FC = () => {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-[600px] flex flex-col">
+        <div className="absolute right-0 mt-2 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-[600px] flex flex-col">
           {/* Header */}
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Notifications
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900">Thông Báo</h3>
               {hasUnread && (
                 <button
                   onClick={handleMarkAllAsRead}
                   className="text-sm text-green-600 hover:text-green-700 font-medium"
                 >
-                  Mark all read
+                  Đánh dấu tất cả đã đọc
                 </button>
               )}
             </div>
             {hasUnread && (
               <p className="text-sm text-gray-500 mt-1">
-                You have {unreadCount} unread notification
-                {unreadCount !== 1 ? "s" : ""}
+                Bạn có {unreadCount} thông báo chưa đọc
               </p>
             )}
           </div>
@@ -153,11 +150,9 @@ export const NotificationDropdown: React.FC = () => {
                     d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
                   />
                 </svg>
-                <p className="text-gray-500 font-medium">
-                  No notifications yet
-                </p>
+                <p className="text-gray-500 font-medium">Chưa có thông báo</p>
                 <p className="text-gray-400 text-sm mt-1">
-                  We'll notify you when something important happens
+                  Chúng tôi sẽ thông báo cho bạn khi có cập nhật mới.
                 </p>
               </div>
             ) : (
@@ -183,7 +178,7 @@ export const NotificationDropdown: React.FC = () => {
                 }}
                 className="text-sm text-green-600 hover:text-green-700 font-medium"
               >
-                View all notifications
+                Xem tất cả thông báo
               </button>
             </div>
           )}

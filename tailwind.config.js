@@ -26,8 +26,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        heading: ["Poppins", "system-ui", "sans-serif"],
+        sans: ["Be Vietnam Pro", "system-ui", "sans-serif"],
+        heading: ["Nunito Sans", "system-ui", "sans-serif"],
       },
     },
   },

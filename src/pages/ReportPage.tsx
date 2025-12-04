@@ -26,7 +26,7 @@ export const ReportPage = () => {
 
   const [formData, setFormData] = useState({
     title: "",
-    species: "",
+    species: "Dog" as "Dog" | "Cat" | "Other",
     type: "injured_animal" as
       | "abuse"
       | "abandonment"
@@ -47,6 +47,9 @@ export const ReportPage = () => {
   const [success, setSuccess] = useState(false);
   const [images, setImages] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -76,6 +79,23 @@ export const ReportPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Clear previous validation errors
+    setValidationErrors({});
+
+    // Validate required fields
+    const errors: Record<string, string> = {};
+    if (!formData.title.trim()) errors.title = "Tiêu đề là bắt buộc";
+    if (!formData.species) errors.species = "Loài động vật là bắt buộc";
+    if (!formData.type) errors.type = "Loại báo cáo là bắt buộc";
+    if (!formData.description.trim()) errors.description = "Mô tả là bắt buộc";
+    if (!formData.location.trim()) errors.location = "Vị trí là bắt buộc";
+
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
     try {
       // Create FormData for multipart/form-data submission
       const formDataToSubmit = new FormData();
@@ -123,9 +143,30 @@ export const ReportPage = () => {
       setTimeout(() => {
         navigate("/");
       }, 3000);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Failed to submit report:", error);
       setUploadProgress(0);
+
+      // Handle validation errors from backend
+      const apiError = error as {
+        response?: {
+          data?: { errors?: Array<{ field?: string; message: string }> };
+        };
+      };
+      if (
+        apiError?.response?.data?.errors &&
+        Array.isArray(apiError.response.data.errors)
+      ) {
+        const backendErrors: Record<string, string> = {};
+        apiError.response.data.errors.forEach(
+          (err: { field?: string; message: string }) => {
+            // Extract field name from path like 'body.species' -> 'species'
+            const field = err.field?.split(".").pop() || "general";
+            backendErrors[field] = err.message;
+          }
+        );
+        setValidationErrors(backendErrors);
+      }
     }
   };
 
@@ -154,7 +195,7 @@ export const ReportPage = () => {
               onPress={() => navigate("/")}
               className="font-semibold"
             >
-              Back to Home
+              Về Trang Chủ
             </Button>
           </CardBody>
         </Card>
@@ -172,12 +213,11 @@ export const ReportPage = () => {
               <AlertCircle className="w-16 h-16 drop-shadow-lg" />
             </div>
             <h1 className="text-4xl md:text-5xl font-heading font-bold drop-shadow-md">
-              Report Animal in Need
+              Báo Cáo Động Vật Cần Giúp
             </h1>
             <p className="text-lg text-white drop-shadow-sm max-w-2xl mx-auto">
-              See an animal that needs help? Report it here. No account
-              required. High and critical urgency reports get immediate
-              attention.
+              Nhìn thấy động vật cần giúp đỡ? Hãy báo cáo tại đây. Không cần tài
+              khoản. Báo cáo mức độ cao và khẩn cấp được ưu tiên xử lý ngay.
             </p>
           </div>
         </div>
@@ -190,28 +230,58 @@ export const ReportPage = () => {
             <CardHeader className="p-6 pb-0">
               <div className="space-y-2">
                 <h2 className="text-2xl font-heading font-bold text-gray-900">
-                  Animal Information
+                  Thông Tin Động Vật
                 </h2>
                 <p className="text-gray-600">
-                  Provide details about the animal that needs help
+                  Cung cấp thông tin chi tiết về động vật cần giúp đỡ
                 </p>
               </div>
             </CardHeader>
             <CardBody className="p-6">
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form
+                onSubmit={handleSubmit}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && e.target instanceof HTMLElement) {
+                    // Allow Enter on textarea and submit button
+                    if (
+                      e.target.tagName !== "TEXTAREA" &&
+                      e.target.tagName !== "BUTTON"
+                    ) {
+                      e.preventDefault();
+                    }
+                  }
+                }}
+                className="space-y-6"
+              >
                 {createReport.isError && (
                   <div className="bg-danger-50 border-2 border-danger-200 rounded-lg p-4 flex items-start gap-3">
                     <AlertCircle className="w-5 h-5 text-danger-500 shrink-0 mt-0.5" />
-                    <p className="text-sm text-danger-700 font-medium">
-                      Failed to submit report. Please try again.
-                    </p>
+                    <div className="flex-1">
+                      <p className="text-sm text-danger-700 font-medium">
+                        {(
+                          createReport.error as {
+                            response?: { data?: { message?: string } };
+                          }
+                        )?.response?.data?.message ||
+                          "Gửi báo cáo thất bại. Vui lòng thử lại."}
+                      </p>
+                      {Object.keys(validationErrors).length > 0 && (
+                        <ul className="mt-2 text-xs text-danger-600 list-disc list-inside">
+                          {Object.entries(validationErrors).map(
+                            ([field, error]) => (
+                              <li key={field}>{error}</li>
+                            )
+                          )}
+                        </ul>
+                      )}
+                    </div>
                   </div>
                 )}
 
                 <Input
                   type="text"
-                  label="Report Title"
-                  placeholder="Brief title for the report"
+                  label="Tiêu Đề Báo Cáo"
+                  placeholder="Tiêu đề ngắn gọn cho báo cáo"
                   value={formData.title}
                   onChange={(e) => handleChange("title", e.target.value)}
                   required
@@ -224,69 +294,86 @@ export const ReportPage = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Animal Species <span className="text-red-500">*</span>
+                    Loài Động Vật <span className="text-red-500">*</span>
                   </label>
                   <Select
-                    placeholder="Select animal species"
+                    placeholder="Chọn loài động vật"
                     selectedKeys={formData.species ? [formData.species] : []}
-                    onChange={(e) => handleChange("species", e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value) {
+                        handleChange("species", value);
+                        // Clear validation error when user selects
+                        setValidationErrors((prev) => ({
+                          ...prev,
+                          species: "",
+                        }));
+                      }
+                    }}
                     required
                     size="lg"
-                    aria-label="Animal species"
+                    aria-label="Loài động vật"
+                    isInvalid={!!validationErrors.species}
+                    errorMessage={validationErrors.species}
+                    disallowEmptySelection
                     classNames={{
                       value: "text-gray-900",
                     }}
                   >
-                    <SelectItem key="dog" value="dog">
-                      Dog
+                    <SelectItem key="Dog" value="Dog">
+                      Chó
                     </SelectItem>
-                    <SelectItem key="cat" value="cat">
-                      Cat
+                    <SelectItem key="Cat" value="Cat">
+                      Mèo
                     </SelectItem>
-                    <SelectItem key="bird" value="bird">
-                      Bird
-                    </SelectItem>
-                    <SelectItem key="rabbit" value="rabbit">
-                      Rabbit
-                    </SelectItem>
-                    <SelectItem key="other" value="other">
-                      Other
+                    <SelectItem key="Other" value="Other">
+                      Khác
                     </SelectItem>
                   </Select>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Report Type <span className="text-red-500">*</span>
+                    Loại Báo Cáo <span className="text-red-500">*</span>
                   </label>
                   <Select
-                    placeholder="Select report type"
+                    placeholder="Chọn loại báo cáo"
                     selectedKeys={formData.type ? [formData.type] : []}
-                    onChange={(e) => handleChange("type", e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value) {
+                        handleChange("type", value);
+                        // Clear validation error when user selects
+                        setValidationErrors((prev) => ({ ...prev, type: "" }));
+                      }
+                    }}
                     required
                     size="lg"
-                    aria-label="Report type"
+                    aria-label="Loại báo cáo"
+                    isInvalid={!!validationErrors.type}
+                    errorMessage={validationErrors.type}
+                    disallowEmptySelection
                     classNames={{
                       value: "text-gray-900",
                     }}
                   >
                     <SelectItem key="abuse" value="abuse">
-                      Abuse
+                      Bạo Hành
                     </SelectItem>
                     <SelectItem key="abandonment" value="abandonment">
-                      Abandonment
+                      Bỏ Rơi
                     </SelectItem>
                     <SelectItem key="injured_animal" value="injured_animal">
-                      Injured Animal
+                      Động Vật Bị Thương
                     </SelectItem>
                     <SelectItem key="other" value="other">
-                      Other
+                      Khác
                     </SelectItem>
                   </Select>
                 </div>
 
                 <RadioGroup
-                  label="Urgency Level"
+                  label="Mức Độ Khẩn Cấp"
                   value={formData.urgency_level}
                   onValueChange={(value) =>
                     handleChange("urgency_level", value)
@@ -297,29 +384,29 @@ export const ReportPage = () => {
                   }}
                 >
                   <Radio value="low" color="success">
-                    Low
+                    Thấp
                   </Radio>
                   <Radio value="medium" color="warning">
-                    Medium
+                    Trung Bình
                   </Radio>
                   <Radio value="high" color="danger">
-                    High
+                    Cao
                   </Radio>
                   <Radio value="critical" color="danger">
-                    Critical
+                    Khẩn Cấp
                   </Radio>
                 </RadioGroup>
 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <p className="text-sm text-blue-800">
-                    <strong>All reports</strong> can be claimed by volunteers
-                    who want to help.
+                    <strong>Tất cả báo cáo</strong> có thể được nhận bởi các
+                    tình nguyện viên muốn giúp đỡ.
                   </p>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Location <span className="text-red-500">*</span>
+                    Vị Trí <span className="text-red-500">*</span>
                   </label>
                   <LocationPicker
                     value={formData.coordinates}
@@ -330,8 +417,8 @@ export const ReportPage = () => {
                 </div>
 
                 <Textarea
-                  label="Description"
-                  placeholder="Describe the animal's condition, behavior, and any other relevant details..."
+                  label="Mô Tả"
+                  placeholder="Mô tả tình trạng, hành vi của động vật và các chi tiết liên quan khác..."
                   value={formData.description}
                   onChange={(e) => handleChange("description", e.target.value)}
                   required
@@ -345,11 +432,11 @@ export const ReportPage = () => {
                 {/* Image Upload Section */}
                 <div className="border-t border-gray-200 pt-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Upload Images (Optional)
+                    Tải Ảnh Lên (Không bắt buộc)
                   </h3>
                   <p className="text-sm text-gray-600 mb-4">
-                    Add up to 5 images to help identify the animal and its
-                    condition. Images help volunteers respond faster.
+                    Thêm tối đa 5 ảnh để giúp xác định động vật và tình trạng
+                    của chúng. Ảnh giúp tình nguyện viên phản hồi nhanh hơn.
                   </p>
 
                   {/* Image Preview Grid */}
@@ -383,7 +470,7 @@ export const ReportPage = () => {
                         ))}
                       </div>
                       <p className="text-xs text-gray-500 mt-2">
-                        {images.length} / 5 images selected
+                        Đã chọn {images.length} / 5 ảnh
                       </p>
                     </div>
                   )}
@@ -396,10 +483,10 @@ export const ReportPage = () => {
                         value={uploadProgress}
                         className="max-w-md"
                         color="primary"
-                        aria-label="Upload progress"
+                        aria-label="Tiến trình tải lên"
                       />
                       <p className="text-xs text-gray-500 mt-2">
-                        Uploading... {uploadProgress}%
+                        Đang tải lên... {uploadProgress}%
                       </p>
                     </div>
                   )}
@@ -411,8 +498,8 @@ export const ReportPage = () => {
                         <Upload className="w-5 h-5 text-gray-500" />
                         <span className="text-sm font-medium text-gray-700">
                           {images.length === 0
-                            ? "Click to upload images or drag and drop"
-                            : "Add more images"}
+                            ? "Nhấp để tải ảnh lên hoặc kéo thả"
+                            : "Thêm ảnh"}
                         </span>
                         <input
                           type="file"
@@ -424,7 +511,7 @@ export const ReportPage = () => {
                         />
                       </label>
                       <p className="text-xs text-gray-500 mt-2">
-                        PNG, JPG, GIF up to 5 images, 5MB each
+                        PNG, JPG, GIF tối đa 5 ảnh, mỗi ảnh 5MB
                       </p>
                     </div>
                   )}
@@ -432,7 +519,7 @@ export const ReportPage = () => {
                   {images.length === 5 && (
                     <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                       <p className="text-sm text-blue-800">
-                        ✓ Maximum images reached
+                        ✓ Đã đạt số lượng ảnh tối đa
                       </p>
                     </div>
                   )}
@@ -441,19 +528,20 @@ export const ReportPage = () => {
                 {!isAuthenticated && (
                   <div className="border-t border-gray-200 pt-6 space-y-4">
                     <h3 className="text-lg font-semibold text-gray-900">
-                      Your Information (Optional)
+                      Thông Tin Của Bạn (Không bắt buộc)
                     </h3>
                     <p className="text-sm text-gray-600 mb-4">
-                      Help us contact you for updates or more information
+                      Giúp chúng tôi liên hệ với bạn để cập nhật hoặc biết thêm
+                      thông tin
                     </p>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Your Name
+                        Tên Của Bạn
                       </label>
                       <Input
                         type="text"
-                        placeholder="Enter your name"
+                        placeholder="Nhập tên của bạn"
                         value={formData.contact_name}
                         onChange={(e) =>
                           handleChange("contact_name", e.target.value)
@@ -464,11 +552,11 @@ export const ReportPage = () => {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number
+                        Số Điện Thoại
                       </label>
                       <Input
                         type="tel"
-                        placeholder="Enter your phone number"
+                        placeholder="Nhập số điện thoại của bạn"
                         value={formData.contact_phone}
                         onChange={(e) =>
                           handleChange("contact_phone", e.target.value)
@@ -479,11 +567,11 @@ export const ReportPage = () => {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address
+                        Địa Chỉ Email
                       </label>
                       <Input
                         type="email"
-                        placeholder="Enter your email address"
+                        placeholder="Nhập địa chỉ email của bạn"
                         value={formData.contact_email}
                         onChange={(e) =>
                           handleChange("contact_email", e.target.value)
@@ -502,7 +590,7 @@ export const ReportPage = () => {
                     className="flex-1"
                     onPress={() => navigate("/")}
                   >
-                    Cancel
+                    Hủy
                   </Button>
                   <Button
                     type="submit"
@@ -511,7 +599,7 @@ export const ReportPage = () => {
                     className="flex-1 font-semibold"
                     isLoading={createReport.isPending}
                   >
-                    Submit Report
+                    Gửi Báo Cáo
                   </Button>
                 </div>
               </form>

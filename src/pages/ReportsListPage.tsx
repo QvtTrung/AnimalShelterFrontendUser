@@ -13,6 +13,8 @@ import {
   Input,
   Pagination,
   DateRangePicker as NextUIDateRangePicker,
+  type DateValue,
+  type RangeValue,
 } from "@nextui-org/react";
 import {
   AlertTriangle,
@@ -28,8 +30,9 @@ export const ReportsPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [urgencyFilter, setUrgencyFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
+  const [speciesFilter, setSpeciesFilter] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("newest");
-  const [dateRange, setDateRange] = useState<{ start: any; end: any } | null>(
+  const [dateRange, setDateRange] = useState<RangeValue<DateValue> | null>(
     null
   );
   const [page, setPage] = useState(1);
@@ -75,6 +78,11 @@ export const ReportsPage = () => {
   // Get reports from API with server-side filtering and pagination
   let reports = Array.isArray(reportsData?.data) ? reportsData.data : [];
 
+  // Apply client-side species filter
+  if (speciesFilter && reports.length > 0) {
+    reports = reports.filter((report) => report.species === speciesFilter);
+  }
+
   // Apply date range filter
   if (dateRange?.start && dateRange?.end && reports.length > 0) {
     const startTime = new Date(
@@ -116,11 +124,11 @@ export const ReportsPage = () => {
               </span>
             </div>
             <h1 className="text-4xl md:text-5xl font-heading font-bold">
-              Animal Reports
+              Báo Cáo Động Vật
             </h1>
             <p className="text-lg text-red-50 max-w-3xl mx-auto">
-              Help animals in need by responding to urgent reports. Every report
-              matters and could save a life.
+              Giúp đỡ động vật cần giúp bằng cách phản hồi các báo cáo khẩn cấp.
+              Mỗi báo cáo đều quan trọng và có thể cứu sống một sinh linh.
             </p>
           </div>
         </div>
@@ -131,7 +139,7 @@ export const ReportsPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-wrap items-end gap-2">
             <Input
-              placeholder="Search by title, animal type, or location..."
+              placeholder="Tìm kiếm theo tiêu đề, loài động vật hoặc vị trí..."
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -148,88 +156,113 @@ export const ReportsPage = () => {
             />
 
             <Select
-              placeholder="All Urgency Levels"
+              placeholder="Tất Cả Mức Độ Khẩn Cấp"
               selectedKeys={urgencyFilter ? [urgencyFilter] : []}
               onChange={(e) => {
                 setUrgencyFilter(e.target.value);
                 setPage(1);
               }}
               size="sm"
-              aria-label="Filter by urgency level"
+              aria-label="Lọc theo mức độ khẩn cấp"
               className="w-40"
               classNames={{
                 trigger: "bg-gray-50",
               }}
             >
               <SelectItem key="critical" value="critical">
-                Critical
+                Khẩn Cấp
               </SelectItem>
               <SelectItem key="high" value="high">
-                High
+                Cao
               </SelectItem>
               <SelectItem key="medium" value="medium">
-                Medium
+                Trung Bình
               </SelectItem>
               <SelectItem key="low" value="low">
-                Low
+                Thấp
               </SelectItem>
             </Select>
 
             <Select
-              placeholder="All Statuses"
+              placeholder="Tất Cả Trạng Thái"
               selectedKeys={statusFilter ? [statusFilter] : []}
               onChange={(e) => {
                 setStatusFilter(e.target.value);
                 setPage(1);
               }}
               size="sm"
-              aria-label="Filter by status"
+              aria-label="Lọc theo trạng thái"
               className="w-32"
               classNames={{
                 trigger: "bg-gray-50",
               }}
             >
               <SelectItem key="pending" value="pending">
-                Pending
+                Chờ Duyệt
               </SelectItem>
               <SelectItem key="assigned" value="assigned">
-                Assigned
+                Đã Nhận
               </SelectItem>
               <SelectItem key="resolved" value="resolved">
-                Resolved
+                Đã Giải Quyết
+              </SelectItem>
+            </Select>
+
+            <Select
+              placeholder="Tất Cả Loài"
+              selectedKeys={speciesFilter ? [speciesFilter] : []}
+              onChange={(e) => {
+                setSpeciesFilter(e.target.value);
+                setPage(1);
+              }}
+              size="sm"
+              aria-label="Lọc theo loài động vật"
+              className="w-32"
+              classNames={{
+                trigger: "bg-gray-50",
+              }}
+            >
+              <SelectItem key="Dog" value="Dog">
+                Chó
+              </SelectItem>
+              <SelectItem key="Cat" value="Cat">
+                Mèo
+              </SelectItem>
+              <SelectItem key="Other" value="Other">
+                Khác
               </SelectItem>
             </Select>
 
             <NextUIDateRangePicker
-              label="Date Range"
+              label="Khoảng Thời Gian"
               className="w-64"
               value={dateRange}
               onChange={setDateRange}
               size="sm"
-              aria-label="Date range filter"
+              aria-label="Lọc theo khoảng thời gian"
               showMonthAndYearPickers
               visibleMonths={2}
             />
 
             <Select
-              label="Sort"
+              label="Sắp Xếp"
               selectedKeys={[sortBy]}
               onChange={(e) => {
                 setSortBy(e.target.value);
                 setPage(1); // Reset to first page when changing sort
               }}
               size="sm"
-              aria-label="Sort by date"
+              aria-label="Sắp xếp theo ngày"
               className="w-36"
               classNames={{
                 trigger: "bg-gray-50",
               }}
             >
               <SelectItem key="newest" value="newest">
-                Newest First
+                Mới Nhất
               </SelectItem>
               <SelectItem key="oldest" value="oldest">
-                Oldest First
+                Cũ Nhất
               </SelectItem>
             </Select>
           </div>
@@ -249,7 +282,7 @@ export const ReportsPage = () => {
             <div className="text-center py-20">
               <AlertTriangle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500 text-lg">
-                No reports found matching your criteria.
+                Không tìm thấy báo cáo nào phù hợp với tiêu chí của bạn.
               </p>
             </div>
           )}
@@ -379,7 +412,7 @@ export const ReportsPage = () => {
                     className="w-full font-semibold"
                     size="lg"
                   >
-                    View Details
+                    Xem Chi Tiết
                   </Button>
                 </CardFooter>
               </Card>
@@ -399,8 +432,8 @@ export const ReportsPage = () => {
               />
               {total > 0 && (
                 <p className="text-gray-500 text-sm">
-                  Showing {(page - 1) * limit + 1}-
-                  {Math.min(page * limit, total)} of {total} reports
+                  Hiển thị {(page - 1) * limit + 1}-
+                  {Math.min(page * limit, total)} trong tổng số {total} báo cáo
                 </p>
               )}
             </div>

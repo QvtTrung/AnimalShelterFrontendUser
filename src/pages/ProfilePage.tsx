@@ -37,12 +37,12 @@ export const ProfilePage = () => {
   const handleSave = async () => {
     try {
       await updateProfileMutation.mutateAsync(formData);
-      toast.success("Profile updated successfully!");
+      toast.success("Cập nhật hồ sơ thành công!");
       setIsEditing(false);
       await refetch();
     } catch (error) {
       console.error("Failed to update profile:", error);
-      toast.error("Failed to update profile. Please try again.");
+      toast.error("Cập nhật hồ sơ thất bại. Vui lòng thử lại.");
     }
   };
 
@@ -71,10 +71,10 @@ export const ProfilePage = () => {
           <CardBody className="text-center py-12">
             <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              User Not Found
+              Không Tìm Thấy Người Dùng
             </h2>
             <p className="text-gray-600 mb-6">
-              Unable to load user information.
+              Không thể tải thông tin người dùng.
             </p>
             <Button
               color="primary"
@@ -82,7 +82,7 @@ export const ProfilePage = () => {
               onPress={() => navigate("/dashboard")}
               startContent={<ArrowLeft className="w-4 h-4" />}
             >
-              Back to Dashboard
+              Về Bảng Điều Khiển
             </Button>
           </CardBody>
         </Card>
@@ -101,12 +101,14 @@ export const ProfilePage = () => {
             startContent={<ArrowLeft className="w-4 h-4" />}
             className="mb-4"
           >
-            Back to Dashboard
+            Về Bảng Điều Khiển
           </Button>
           <h1 className="text-3xl md:text-4xl font-heading font-bold text-gray-900">
-            My Profile
+            Hồ Sơ Của Tôi
           </h1>
-          <p className="text-gray-600 mt-2">Manage your personal information</p>
+          <p className="text-gray-600 mt-2">
+            Quản lý thông tin cá nhân của bạn
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -133,7 +135,8 @@ export const ProfilePage = () => {
                 <div className="mt-4 flex items-center justify-center gap-2 text-sm text-gray-600">
                   <Calendar className="w-4 h-4" />
                   <span>
-                    Born: {new Date(user.date_of_birth).toLocaleDateString()}
+                    Ngày sinh:{" "}
+                    {new Date(user.date_of_birth).toLocaleDateString()}
                   </span>
                 </div>
               )}
@@ -144,7 +147,7 @@ export const ProfilePage = () => {
           <Card className="lg:col-span-2">
             <CardHeader className="flex items-center justify-between p-6 pb-4">
               <h3 className="text-xl font-bold text-gray-900">
-                Personal Information
+                Thông Tin Cá Nhân
               </h3>
               {!isEditing ? (
                 <Button
@@ -152,7 +155,7 @@ export const ProfilePage = () => {
                   variant="flat"
                   onPress={() => setIsEditing(true)}
                 >
-                  Edit Profile
+                  Chỉnh Sửa Hồ Sơ
                 </Button>
               ) : (
                 <div className="flex gap-2">
@@ -162,14 +165,14 @@ export const ProfilePage = () => {
                     onPress={handleCancel}
                     isDisabled={updateProfileMutation.isPending}
                   >
-                    Cancel
+                    Hủy
                   </Button>
                   <Button
                     color="primary"
                     onPress={handleSave}
                     isLoading={updateProfileMutation.isPending}
                   >
-                    Save Changes
+                    Lưu Thay Đổi
                   </Button>
                 </div>
               )}
@@ -179,8 +182,8 @@ export const ProfilePage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
                     type="text"
-                    label="First Name"
-                    placeholder="Enter your first name"
+                    label="Tên"
+                    placeholder="Nhập tên của bạn"
                     value={formData.first_name}
                     onChange={(e) => handleChange("first_name", e.target.value)}
                     startContent={<User className="w-4 h-4 text-gray-400" />}
@@ -194,8 +197,8 @@ export const ProfilePage = () => {
 
                   <Input
                     type="text"
-                    label="Last Name"
-                    placeholder="Enter your last name"
+                    label="Họ"
+                    placeholder="Nhập họ của bạn"
                     value={formData.last_name}
                     onChange={(e) => handleChange("last_name", e.target.value)}
                     startContent={<User className="w-4 h-4 text-gray-400" />}
@@ -215,7 +218,7 @@ export const ProfilePage = () => {
                   startContent={<Mail className="w-4 h-4 text-gray-400" />}
                   isReadOnly
                   variant="flat"
-                  description="Email cannot be changed"
+                  description="Email không thể thay đổi"
                   classNames={{
                     input: "text-gray-900",
                     label: "text-gray-700 font-medium",
@@ -224,8 +227,8 @@ export const ProfilePage = () => {
 
                 <Input
                   type="tel"
-                  label="Phone Number"
-                  placeholder="Enter your phone number"
+                  label="Số Điện Thoại"
+                  placeholder="Nhập số điện thoại của bạn"
                   value={formData.phone_number}
                   onChange={(e) => handleChange("phone_number", e.target.value)}
                   startContent={<Phone className="w-4 h-4 text-gray-400" />}
@@ -239,8 +242,8 @@ export const ProfilePage = () => {
 
                 <Input
                   type="text"
-                  label="Address"
-                  placeholder="Enter your address"
+                  label="Địa Chỉ"
+                  placeholder="Nhập địa chỉ của bạn"
                   value={formData.address}
                   onChange={(e) => handleChange("address", e.target.value)}
                   startContent={<MapPin className="w-4 h-4 text-gray-400" />}
@@ -259,12 +262,14 @@ export const ProfilePage = () => {
         {/* Account Status Card */}
         <Card className="mt-6">
           <CardHeader className="p-6 pb-4">
-            <h3 className="text-xl font-bold text-gray-900">Account Status</h3>
+            <h3 className="text-xl font-bold text-gray-900">
+              Trạng Thái Tài Khoản
+            </h3>
           </CardHeader>
           <CardBody className="p-6 pt-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <span className="text-gray-700 font-medium">Status</span>
+                <span className="text-gray-700 font-medium">Trạng Thái</span>
                 <span
                   className={`px-3 py-1 rounded-full text-sm font-medium ${
                     user.status === "active"
@@ -278,7 +283,7 @@ export const ProfilePage = () => {
                 </span>
               </div>
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <span className="text-gray-700 font-medium">Role</span>
+                <span className="text-gray-700 font-medium">Vai Trò</span>
                 <span className="px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-700">
                   {user.role
                     ? user.role.charAt(0).toUpperCase() + user.role.slice(1)

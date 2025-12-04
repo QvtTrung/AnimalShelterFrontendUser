@@ -18,6 +18,8 @@ import {
   Select,
   SelectItem,
   DateRangePicker as NextUIDateRangePicker,
+  type DateValue,
+  type RangeValue,
 } from "@nextui-org/react";
 import { Calendar } from "lucide-react";
 import { useRescues } from "../hooks/useRescues";
@@ -26,7 +28,7 @@ export const RescuesPage = () => {
   const [selectedTab, setSelectedTab] = useState("all");
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState<string>("newest");
-  const [dateRange, setDateRange] = useState<{ start: any; end: any } | null>(
+  const [dateRange, setDateRange] = useState<RangeValue<DateValue> | null>(
     null
   );
   const limit = 9;
@@ -100,11 +102,11 @@ export const RescuesPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4">
             <h1 className="text-4xl md:text-5xl font-heading font-bold">
-              Rescue Campaigns
+              Chiến Dịch Cứu Hộ
             </h1>
             <p className="text-lg text-blue-50 max-w-2xl mx-auto">
-              Join organized rescue missions to save animals in need. Every
-              contribution makes a difference!
+              Tham gia các nhiệm vụ cứu hộ có tổ chức để cứu giúp động vật cần
+              giúp đỡ. Mỗi đóng góp đều tạo nên sự khác biệt!
             </p>
           </div>
         </div>
@@ -128,35 +130,35 @@ export const RescuesPage = () => {
                 tab: "h-12",
               }}
             >
-              <Tab key="all" title="All Campaigns" />
-              <Tab key="planned" title="Planned" />
-              <Tab key="in_progress" title="In Progress" />
-              <Tab key="completed" title="Completed" />
-              <Tab key="cancelled" title="Cancelled" />
+              <Tab key="all" title="Tất Cả Chiến Dịch" />
+              <Tab key="planned" title="Đã Lên Kế Hoạch" />
+              <Tab key="in_progress" title="Đang Thực Hiện" />
+              <Tab key="completed" title="Hoàn Thành" />
+              <Tab key="cancelled" title="Đã Hủy" />
             </Tabs>
             <div className="flex flex-wrap items-end gap-2">
               <NextUIDateRangePicker
-                label="Date Range"
+                label="Khoảng Thời Gian"
                 className="w-64"
                 value={dateRange}
                 onChange={setDateRange}
                 size="sm"
-                aria-label="Date range filter"
+                aria-label="Lọc theo khoảng thời gian"
                 showMonthAndYearPickers
                 visibleMonths={2}
               />
               <Select
-                label="Sort"
+                label="Sắp Xếp"
                 selectedKeys={[sortBy]}
                 onChange={(e) => setSortBy(e.target.value)}
                 className="w-36"
                 size="sm"
               >
                 <SelectItem key="newest" value="newest">
-                  Newest First
+                  Mới Nhất
                 </SelectItem>
                 <SelectItem key="oldest" value="oldest">
-                  Oldest First
+                  Cũ Nhất
                 </SelectItem>
               </Select>
             </div>
@@ -176,7 +178,7 @@ export const RescuesPage = () => {
           {isError && (
             <div className="text-center py-20">
               <p className="text-red-500 text-lg">
-                Failed to load campaigns. Please try again later.
+                Không thể tải chiến dịch. Vui lòng thử lại sau.
               </p>
             </div>
           )}
@@ -184,7 +186,7 @@ export const RescuesPage = () => {
           {!isLoading && !isError && rescues.length === 0 && (
             <div className="text-center py-20">
               <p className="text-gray-500 text-lg">
-                No rescue campaigns found for this category.
+                Không tìm thấy chiến dịch cứu hộ nào cho danh mục này.
               </p>
             </div>
           )}
@@ -194,7 +196,7 @@ export const RescuesPage = () => {
             <Card className="shadow-lg">
               <CardBody className="p-0">
                 <Table
-                  aria-label="Rescue campaigns table"
+                  aria-label="Bảng chiến dịch cứu hộ"
                   classNames={{
                     wrapper: "min-h-[400px]",
                     th: "bg-gray-100 text-gray-700 font-semibold text-sm",
@@ -202,13 +204,15 @@ export const RescuesPage = () => {
                   }}
                 >
                   <TableHeader>
-                    <TableColumn className="text-base">CAMPAIGN</TableColumn>
-                    <TableColumn className="text-base">STATUS</TableColumn>
-                    <TableColumn className="text-base">START DATE</TableColumn>
+                    <TableColumn className="text-base">CHIẾN DỊCH</TableColumn>
+                    <TableColumn className="text-base">TRẠNG THÁI</TableColumn>
                     <TableColumn className="text-base">
-                      PARTICIPANTS
+                      NGÀY BẮT ĐẦU
                     </TableColumn>
-                    <TableColumn className="text-base">ACTIONS</TableColumn>
+                    <TableColumn className="text-base">
+                      NGƯỜI THAM GIA
+                    </TableColumn>
+                    <TableColumn className="text-base">HÀNH ĐỘNG</TableColumn>
                   </TableHeader>
                   <TableBody>
                     {rescues.map((rescue) => (
@@ -220,7 +224,7 @@ export const RescuesPage = () => {
                             </p>
                             <p className="text-sm text-gray-600 line-clamp-2">
                               {rescue.description ||
-                                "Join this rescue campaign"}
+                                "Tham gia chiến dịch cứu hộ này"}
                             </p>
                           </div>
                         </TableCell>
@@ -242,7 +246,7 @@ export const RescuesPage = () => {
                                 ? new Date(
                                     rescue.date_created
                                   ).toLocaleDateString()
-                                : "Date TBD"}
+                                : "Chưa Xác Định"}
                             </span>
                           </div>
                         </TableCell>
@@ -263,7 +267,7 @@ export const RescuesPage = () => {
                             variant="flat"
                             className="font-medium"
                           >
-                            View Details
+                            Xem Chi Tiết
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -294,11 +298,11 @@ export const RescuesPage = () => {
       <section className="py-20 bg-blue-500">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-heading font-bold text-white mb-4">
-            Want to Start a Campaign?
+            Muốn Tạo Chiến Dịch?
           </h2>
           <p className="text-lg text-blue-50 mb-8">
-            Have you encountered animals that need urgent rescue? Create a
-            campaign and rally volunteers to help!
+            Bạn đã gặp động vật cần cứu hộ khẩn cấp? Tạo một chiến dịch và tập
+            hợp tình nguyện viên để giúp đỡ!
           </p>
           <Button
             as={Link}
@@ -306,7 +310,7 @@ export const RescuesPage = () => {
             size="lg"
             className="bg-white text-blue-600 font-bold hover:bg-gray-100 px-10 h-14"
           >
-            Create Campaign
+            Tạo Chiến Dịch
           </Button>
         </div>
       </section>

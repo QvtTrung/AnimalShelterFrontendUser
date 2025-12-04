@@ -23,8 +23,8 @@ export const Footer = () => {
               </span>
             </div>
             <p className="text-sm">
-              Helping animals find their forever homes and providing emergency
-              rescue services for animals in need.
+              Giúp động vật tìm được ngôi nhà mãi mãi và cung cấp dịch vụ cứu hộ
+              khẩn cấp cho động vật cần giúp đỡ.
             </p>
             <div className="flex gap-4">
               <a
@@ -51,7 +51,7 @@ export const Footer = () => {
           {/* Quick Links */}
           <div>
             <h3 className="text-white font-semibold text-lg mb-4">
-              Quick Links
+              Liên Kết Nhanh
             </h3>
             <ul className="space-y-2">
               <li>
@@ -59,7 +59,7 @@ export const Footer = () => {
                   to="/pets"
                   className="text-sm hover:text-primary-500 transition-colors"
                 >
-                  Adopt a Pet
+                  Nhận Nuôi Thú Cưng
                 </Link>
               </li>
               <li>
@@ -67,7 +67,7 @@ export const Footer = () => {
                   to="/report"
                   className="text-sm hover:text-primary-500 transition-colors"
                 >
-                  Report Animal in Need
+                  Báo Cáo Động Vật Cần Giúp
                 </Link>
               </li>
               <li>
@@ -75,7 +75,7 @@ export const Footer = () => {
                   to="/rescues"
                   className="text-sm hover:text-primary-500 transition-colors"
                 >
-                  Rescue Campaigns
+                  Chiến Dịch Cứu Hộ
                 </Link>
               </li>
               <li>
@@ -83,7 +83,7 @@ export const Footer = () => {
                   to="/about"
                   className="text-sm hover:text-primary-500 transition-colors"
                 >
-                  About Us
+                  Về Chúng Tôi
                 </Link>
               </li>
             </ul>
@@ -91,14 +91,16 @@ export const Footer = () => {
 
           {/* Resources */}
           <div>
-            <h3 className="text-white font-semibold text-lg mb-4">Resources</h3>
+            <h3 className="text-white font-semibold text-lg mb-4">
+              Tài Nguyên
+            </h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   to="/faq"
                   className="text-sm hover:text-primary-500 transition-colors"
                 >
-                  FAQ
+                  Câu Hỏi Thường Gặp
                 </Link>
               </li>
               <li>
@@ -106,7 +108,7 @@ export const Footer = () => {
                   to="/volunteer"
                   className="text-sm hover:text-primary-500 transition-colors"
                 >
-                  Become a Volunteer
+                  Trở Thành Tình Nguyện Viên
                 </Link>
               </li>
               <li>
@@ -114,7 +116,7 @@ export const Footer = () => {
                   to="/donate"
                   className="text-sm hover:text-primary-500 transition-colors"
                 >
-                  Donate
+                  Quyên Góp
                 </Link>
               </li>
               <li>
@@ -122,7 +124,7 @@ export const Footer = () => {
                   to="/contact"
                   className="text-sm hover:text-primary-500 transition-colors"
                 >
-                  Contact Us
+                  Liên Hệ Chúng Tôi
                 </Link>
               </li>
             </ul>
@@ -130,7 +132,7 @@ export const Footer = () => {
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-white font-semibold text-lg mb-4">Contact</h3>
+            <h3 className="text-white font-semibold text-lg mb-4">Liên Hệ</h3>
             <ul className="space-y-3">
               <li className="flex items-start gap-2">
                 <MapPin className="w-5 h-5 text-primary-500 shrink-0 mt-0.5" />
@@ -152,8 +154,8 @@ export const Footer = () => {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
           <p>
-            &copy; {new Date().getFullYear()} Pet Rescue & Adoption. All rights
-            reserved.
+            &copy; {new Date().getFullYear()} Pet Rescue & Adoption. Bảo lưu mọi
+            quyền.
           </p>
         </div>
       </div>

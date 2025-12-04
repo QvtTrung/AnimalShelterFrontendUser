@@ -37,7 +37,7 @@ export const useNotifications = () => {
       setNotifications(response.data);
       return response.data;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch notifications';
+      const errorMessage = err instanceof Error ? err.message : 'Không thể tải thông báo';
       setError(errorMessage);
       console.error('Error fetching notifications:', err);
       return [];
@@ -80,7 +80,7 @@ export const useNotifications = () => {
       
       return true;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to mark notification as read';
+      const errorMessage = err instanceof Error ? err.message : 'Không thể đánh dấu thông báo đã đọc';
       setError(errorMessage);
       console.error('Error marking notification as read:', err);
       return false;
@@ -102,7 +102,7 @@ export const useNotifications = () => {
       
       return true;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to mark all notifications as read';
+      const errorMessage = err instanceof Error ? err.message : 'Không thể đánh dấu tất cả thông báo đã đọc';
       setError(errorMessage);
       console.error('Error marking all notifications as read:', err);
       return false;

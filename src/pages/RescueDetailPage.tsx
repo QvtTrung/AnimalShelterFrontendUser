@@ -111,7 +111,7 @@ export const RescueDetailPage = () => {
     if (!id) return;
 
     if (!isAuthenticated) {
-      toast.error("Please login to join a rescue campaign");
+      toast.error("Đăng nhập để tham gia chiến dịch cứu hộ");
       onOpenChange();
       navigate("/login", { state: { from: { pathname: `/rescues/${id}` } } });
       return;
@@ -120,12 +120,12 @@ export const RescueDetailPage = () => {
     try {
       await joinRescueMutation.mutateAsync(id);
       toast.success(
-        "Joined rescue campaign successfully! Check your dashboard."
+        "Tham gia chiến dịch cứu hộ thành công! Kiểm tra bảng điều khiển của bạn."
       );
       onOpenChange();
     } catch (error: unknown) {
       console.error("Failed to join rescue:", error);
-      toast.error("Failed to join rescue campaign. Please try again.");
+      toast.error("Tham gia chiến dịch cứu hộ thất bại. Vui lòng thử lại.");
     }
   };
 
@@ -133,14 +133,14 @@ export const RescueDetailPage = () => {
     if (!id) return;
     try {
       await startRescueMutation.mutateAsync(id);
-      toast.success("Rescue campaign started successfully!");
+      toast.success("Bắt đầu chiến dịch cứu hộ thành công!");
       onStartOpenChange();
     } catch (error: unknown) {
       console.error("Failed to start rescue:", error);
       const errorMessage =
         (error as { response?: { data?: { message?: string } } })?.response
           ?.data?.message ||
-        "Failed to start rescue campaign. Please try again.";
+        "Bắt đầu chiến dịch cứu hộ thất bại. Vui lòng thử lại.";
       toast.error(errorMessage);
     }
   };
@@ -152,7 +152,7 @@ export const RescueDetailPage = () => {
         rescueId: id,
         reason: cancelReason,
       });
-      toast.success("Rescue campaign cancelled successfully!");
+      toast.success("Hủy chiến dịch cứu hộ thành công!");
       setCancelReason("");
       onCancelOpenChange();
     } catch (error: unknown) {
@@ -160,7 +160,7 @@ export const RescueDetailPage = () => {
       const errorMessage =
         (error as { response?: { data?: { message?: string } } })?.response
           ?.data?.message ||
-        "Failed to cancel rescue campaign. Please try again.";
+        "Hủy chiến dịch cứu hộ thất bại. Vui lòng thử lại.";
       toast.error(errorMessage);
     }
   };
@@ -169,14 +169,14 @@ export const RescueDetailPage = () => {
     if (!id) return;
     try {
       await completeRescueMutation.mutateAsync(id);
-      toast.success("Rescue campaign completed successfully!");
+      toast.success("Hoàn thành chiến dịch cứu hộ thành công!");
       onCompleteOpenChange();
     } catch (error: unknown) {
       console.error("Failed to complete rescue:", error);
       const errorMessage =
         (error as { response?: { data?: { message?: string } } })?.response
           ?.data?.message ||
-        "Failed to complete rescue campaign. Please try again.";
+        "Hoàn thành chiến dịch cứu hộ thất bại. Vui lòng thử lại.";
       toast.error(errorMessage);
     }
   };
@@ -215,14 +215,14 @@ export const RescueDetailPage = () => {
         status: progressStatus,
         note: progressNote,
       });
-      toast.success("Report progress updated successfully!");
+      toast.success("Cập nhật tiến độ báo cáo thành công!");
       setSelectedReportProgress(null);
       onProgressOpenChange();
     } catch (error: unknown) {
       console.error("Failed to update progress:", error);
       const errorMessage =
         (error as { response?: { data?: { message?: string } } })?.response
-          ?.data?.message || "Failed to update progress. Please try again.";
+          ?.data?.message || "Cập nhật tiến độ thất bại. Vui lòng thử lại.";
       toast.error(errorMessage);
     }
   };
@@ -242,11 +242,10 @@ export const RescueDetailPage = () => {
           <CardBody className="text-center py-12">
             <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Rescue Campaign Not Found
+              Không Tìm Thấy Chiến Dịch Cứu Hộ
             </h2>
             <p className="text-gray-600 mb-6">
-              The rescue campaign you're looking for doesn't exist or has been
-              removed.
+              Chiến dịch cứu hộ bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
             </p>
             <Button
               as={Link}
@@ -255,7 +254,7 @@ export const RescueDetailPage = () => {
               variant="flat"
               startContent={<ArrowLeft className="w-4 h-4" />}
             >
-              Back to Rescues
+              Quay Lại Danh Sách Cứu Hộ
             </Button>
           </CardBody>
         </Card>
@@ -279,7 +278,7 @@ export const RescueDetailPage = () => {
             variant="light"
             startContent={<ArrowLeft className="w-4 h-4" />}
           >
-            Back to Rescues
+            Quay Lại Danh Sách Cứu Hộ
           </Button>
         </div>
       </div>
@@ -294,7 +293,7 @@ export const RescueDetailPage = () => {
                 <h1 className="text-4xl font-heading font-bold text-gray-900 mb-2">
                   {rescue.title}
                 </h1>
-                <p className="text-xl text-gray-600">Rescue Campaign</p>
+                <p className="text-xl text-gray-600">Chiến Dịch Cứu Hộ</p>
               </div>
             </div>
 
@@ -308,17 +307,17 @@ export const RescueDetailPage = () => {
               </Chip>
               {isFull && (
                 <Chip color="danger" size="lg" variant="flat">
-                  Full - No more slots
+                  Đầy - Không Còn Chỗ
                 </Chip>
               )}
               {isLeader && (
                 <Chip color="success" size="lg" variant="flat">
-                  You are the Leader
+                  Bạn Là Trưởng Nhóm
                 </Chip>
               )}
               {isMember && (
                 <Chip color="primary" size="lg" variant="flat">
-                  You are a Member
+                  Bạn Là Thành Viên
                 </Chip>
               )}
             </div>
@@ -329,9 +328,9 @@ export const RescueDetailPage = () => {
                 rescue.status === "in_progress") && (
                 <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                   <p className="text-sm text-blue-800">
-                    <strong>Note:</strong> You are a member of this rescue
-                    campaign. Only the rescue leader can start, complete, cancel
-                    the campaign or update report progress.
+                    <strong>Lưu ý:</strong> Bạn là thành viên của chiến dịch cứu
+                    hộ này. Chỉ có trưởng nhóm mới có thể bắt đầu, hoàn thành,
+                    hủy chiến dịch hoặc cập nhật tiến độ báo cáo.
                   </p>
                 </div>
               )}
@@ -341,11 +340,11 @@ export const RescueDetailPage = () => {
           <Card>
             <CardBody className="p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-3">
-                About This Campaign
+                Giới Thiệu Chiến Dịch
               </h2>
               <p className="text-gray-700 leading-relaxed">
                 {rescue.description ||
-                  "Join this rescue campaign to help save animals in need. Your participation makes a real difference."}
+                  "Tham gia chiến dịch cứu hộ này để giúp cứu các động vật cần giúp đỡ. Sự tham gia của bạn tạo nên sự khác biệt thật sự."}
               </p>
             </CardBody>
           </Card>
@@ -354,25 +353,25 @@ export const RescueDetailPage = () => {
           <Card>
             <CardBody className="p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
-                Campaign Details
+                Chi Tiết Chiến Dịch
               </h2>
               <div className="space-y-4">
                 {/* Start Date */}
                 <div className="flex items-center gap-3">
                   <Calendar className="w-5 h-5 text-gray-500" />
                   <div>
-                    <p className="text-sm text-gray-500">Start Date</p>
+                    <p className="text-sm text-gray-500">Ngày Bắt Đầu</p>
                     <p className="text-gray-700 font-medium">
                       {rescue.start_date
                         ? new Date(rescue.start_date).toLocaleDateString(
-                            "en-US",
+                            "vi-VN",
                             {
                               year: "numeric",
                               month: "long",
                               day: "numeric",
                             }
                           )
-                        : "To be announced"}
+                        : "Sẽ thông báo sau"}
                     </p>
                   </div>
                 </div>
@@ -382,9 +381,9 @@ export const RescueDetailPage = () => {
                   <div className="flex items-center gap-3">
                     <Calendar className="w-5 h-5 text-gray-500" />
                     <div>
-                      <p className="text-sm text-gray-500">End Date</p>
+                      <p className="text-sm text-gray-500">Ngày Kết Thúc</p>
                       <p className="text-gray-700 font-medium">
-                        {new Date(rescue.end_date).toLocaleDateString("en-US", {
+                        {new Date(rescue.end_date).toLocaleDateString("vi-VN", {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
@@ -398,12 +397,12 @@ export const RescueDetailPage = () => {
                 <div className="flex items-center gap-3">
                   <Users className="w-5 h-5 text-gray-500" />
                   <div>
-                    <p className="text-sm text-gray-500">Participants</p>
+                    <p className="text-sm text-gray-500">Người Tham Gia</p>
                     <p className="text-gray-700 font-medium">
                       {currentParticipants}
                       {requiredParticipants > 0 &&
                         ` / ${requiredParticipants}`}{" "}
-                      volunteers
+                      tình nguyện viên
                     </p>
                   </div>
                 </div>
@@ -417,7 +416,7 @@ export const RescueDetailPage = () => {
               <Card>
                 <CardBody className="p-6">
                   <h2 className="text-xl font-bold text-gray-900 mb-4">
-                    Related Reports
+                    Báo Cáo Liên Quan
                   </h2>
                   <div className="space-y-3">
                     {rescue.reports.map((rescueReport) => {
@@ -437,7 +436,7 @@ export const RescueDetailPage = () => {
                               <div className="flex items-center gap-2 mb-2">
                                 <p className="font-medium text-gray-900">
                                   {rescueReport.report?.title ||
-                                    `Report #${reportIdStr.substring(0, 8)}`}
+                                    `Báo cáo #${reportIdStr.substring(0, 8)}`}
                                 </p>
                                 <Chip
                                   size="sm"
@@ -473,7 +472,7 @@ export const RescueDetailPage = () => {
                                     handleOpenProgressModal(rescueReport)
                                   }
                                 >
-                                  Update Progress
+                                  Cập Nhật Tiến Độ
                                 </Button>
                               )}
                               <Button
@@ -483,7 +482,7 @@ export const RescueDetailPage = () => {
                                 variant="flat"
                                 color="default"
                               >
-                                View Report
+                                Xem Báo Cáo
                               </Button>
                             </div>
                           </div>
@@ -515,7 +514,7 @@ export const RescueDetailPage = () => {
                 onPress={onStartOpen}
                 startContent={<PlayCircle className="w-5 h-5" />}
               >
-                Start Rescue Campaign
+                Bắt Đầu Chiến Dịch Cứu Hộ
               </Button>
               <Button
                 color="danger"
@@ -525,7 +524,7 @@ export const RescueDetailPage = () => {
                 onPress={onCancelOpen}
                 startContent={<XCircle className="w-5 h-5" />}
               >
-                Cancel Campaign
+                Hủy Chiến Dịch
               </Button>
             </div>
           )}
@@ -539,7 +538,7 @@ export const RescueDetailPage = () => {
                 onPress={onCompleteOpen}
                 startContent={<CheckCircle className="w-5 h-5" />}
               >
-                Complete Campaign
+                Hoàn Thành Chiến Dịch
               </Button>
               <Button
                 color="danger"
@@ -549,7 +548,7 @@ export const RescueDetailPage = () => {
                 onPress={onCancelOpen}
                 startContent={<XCircle className="w-5 h-5" />}
               >
-                Cancel Campaign
+                Hủy Chiến Dịch
               </Button>
             </div>
           )}
@@ -564,7 +563,7 @@ export const RescueDetailPage = () => {
                 onPress={onOpen}
                 startContent={<UserPlus className="w-5 h-5" />}
               >
-                Join This Rescue Campaign
+                Tham Gia Chiến Dịch Cứu Hộ
               </Button>
             )}
 
@@ -572,8 +571,7 @@ export const RescueDetailPage = () => {
             <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-6 text-center">
               <AlertTriangle className="w-12 h-12 text-orange-600 mx-auto mb-2" />
               <p className="text-orange-800 font-medium">
-                This rescue campaign has reached its maximum number of
-                participants.
+                Chiến dịch cứu hộ này đã đạt số lượng người tham gia tối đa.
               </p>
             </div>
           )}
@@ -582,8 +580,8 @@ export const RescueDetailPage = () => {
             <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 text-center">
               <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-2" />
               <p className="text-green-800 font-semibold">
-                This rescue campaign has been completed successfully. Thank you
-                to all volunteers!
+                Chiến dịch cứu hộ này đã hoàn thành thành công. Cảm ơn tất cả
+                tình nguyện viên!
               </p>
             </div>
           )}
@@ -591,7 +589,7 @@ export const RescueDetailPage = () => {
           {rescue.status === "cancelled" && (
             <div className="bg-red-50 border-2 border-red-200 rounded-lg p-6 text-center">
               <p className="text-red-800 font-medium">
-                This rescue campaign has been cancelled.
+                Chiến dịch cứu hộ này đã bị hủy.
               </p>
             </div>
           )}
@@ -604,9 +602,11 @@ export const RescueDetailPage = () => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                <h2 className="text-2xl font-bold">Join Rescue Campaign</h2>
+                <h2 className="text-2xl font-bold">
+                  Tham Gia Chiến Dịch Cứu Hộ
+                </h2>
                 <p className="text-sm text-gray-600 font-normal">
-                  Become a volunteer for this rescue mission
+                  Trở thành tình nguyện viên cho nhiệm vụ cứu hộ này
                 </p>
               </ModalHeader>
               <ModalBody>
@@ -614,8 +614,8 @@ export const RescueDetailPage = () => {
                   {!isAuthenticated && (
                     <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                       <p className="text-sm text-yellow-800">
-                        You need to be logged in to join a rescue campaign.
-                        Please login or register first.
+                        Bạn cần đăng nhập để tham gia chiến dịch cứu hộ. Vui
+                        lòng đăng nhập hoặc đăng ký trước.
                       </p>
                     </div>
                   )}
@@ -623,27 +623,29 @@ export const RescueDetailPage = () => {
                     <>
                       <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                         <p className="text-sm text-blue-800">
-                          <strong>Note:</strong> Once you join, this campaign
-                          will appear in your dashboard. Please commit to
-                          participating in the rescue mission.
+                          <strong>Lưu ý:</strong> Sau khi tham gia, chiến dịch
+                          này sẽ xuất hiện trong bảng điều khiển của bạn. Vui
+                          lòng cam kết tham gia nhiệm vụ cứu hộ.
                         </p>
                       </div>
                       <div className="space-y-2">
                         <p className="text-gray-700 font-medium">
-                          Campaign Details:
+                          Chi Tiết Chiến Dịch:
                         </p>
                         <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
                           <li>
-                            Status: <strong>{rescue.status}</strong>
+                            Trạng thái: <strong>{rescue.status}</strong>
                           </li>
                           {rescue.start_date && (
                             <li>
-                              Start Date:{" "}
-                              {new Date(rescue.start_date).toLocaleDateString()}
+                              Ngày bắt đầu:{" "}
+                              {new Date(rescue.start_date).toLocaleDateString(
+                                "vi-VN"
+                              )}
                             </li>
                           )}
                           <li>
-                            Current Participants: {currentParticipants}
+                            Người tham gia hiện tại: {currentParticipants}
                             {requiredParticipants > 0 &&
                               ` / ${requiredParticipants}`}
                           </li>
@@ -655,7 +657,7 @@ export const RescueDetailPage = () => {
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={onClose}>
-                  Cancel
+                  Hủy
                 </Button>
                 <Button
                   color="primary"
@@ -664,7 +666,7 @@ export const RescueDetailPage = () => {
                   isDisabled={!isAuthenticated}
                   className="font-semibold"
                 >
-                  {isAuthenticated ? "Join Campaign" : "Login Required"}
+                  {isAuthenticated ? "Tham Gia Chiến Dịch" : "Cần Đăng Nhập"}
                 </Button>
               </ModalFooter>
             </>
@@ -680,29 +682,31 @@ export const RescueDetailPage = () => {
               <ModalHeader>
                 <div className="flex items-center gap-2">
                   <PlayCircle className="w-6 h-6 text-blue-500" />
-                  <h2 className="text-2xl font-bold">Start Rescue Campaign</h2>
+                  <h2 className="text-2xl font-bold">
+                    Bắt Đầu Chiến Dịch Cứu Hộ
+                  </h2>
                 </div>
               </ModalHeader>
               <ModalBody>
                 <div className="space-y-4">
                   <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-sm text-blue-800">
-                      <strong>This will:</strong>
+                      <strong>Hành động này sẽ:</strong>
                     </p>
                     <ul className="list-disc list-inside text-sm text-blue-800 mt-2 space-y-1">
-                      <li>Change the rescue status to "In Progress"</li>
-                      <li>Notify all participants</li>
-                      <li>Allow you to track and update report progress</li>
+                      <li>Thay đổi trạng thái cứu hộ thành "Đang Thực Hiện"</li>
+                      <li>Thông báo cho tất cả người tham gia</li>
+                      <li>Cho phép bạn theo dõi và cập nhật tiến độ báo cáo</li>
                     </ul>
                   </div>
                   <p className="text-gray-700">
-                    Are you sure you want to start this rescue campaign?
+                    Bạn có chắc chắn muốn bắt đầu chiến dịch cứu hộ này?
                   </p>
                 </div>
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={onClose}>
-                  Cancel
+                  Hủy
                 </Button>
                 <Button
                   color="primary"
@@ -710,7 +714,7 @@ export const RescueDetailPage = () => {
                   isLoading={startRescueMutation.isPending}
                   startContent={<PlayCircle className="w-4 h-4" />}
                 >
-                  Start Campaign
+                  Bắt Đầu Chiến Dịch
                 </Button>
               </ModalFooter>
             </>
@@ -726,23 +730,23 @@ export const RescueDetailPage = () => {
               <ModalHeader>
                 <div className="flex items-center gap-2">
                   <XCircle className="w-6 h-6 text-red-500" />
-                  <h2 className="text-2xl font-bold">Cancel Rescue Campaign</h2>
+                  <h2 className="text-2xl font-bold">Hủy Chiến Dịch Cứu Hộ</h2>
                 </div>
               </ModalHeader>
               <ModalBody>
                 <div className="space-y-4">
                   <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
                     <p className="text-sm text-red-800">
-                      <strong>Warning:</strong> All assigned reports will be
-                      returned to pending status.
+                      <strong>Cảnh báo:</strong> Tất cả báo cáo được phân công
+                      sẽ được trả về trạng thái chờ xử lý.
                     </p>
                   </div>
                   <p className="text-gray-700">
-                    Are you sure you want to cancel this rescue campaign?
+                    Bạn có chắc chắn muốn hủy chiến dịch cứu hộ này?
                   </p>
                   <Textarea
-                    label="Reason for cancellation (optional)"
-                    placeholder="Enter reason..."
+                    label="Lý do hủy (không bắt buộc)"
+                    placeholder="Nhập lý do..."
                     value={cancelReason}
                     onValueChange={setCancelReason}
                     minRows={3}
@@ -751,7 +755,7 @@ export const RescueDetailPage = () => {
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={onClose}>
-                  Back
+                  Quay Lại
                 </Button>
                 <Button
                   color="danger"
@@ -759,7 +763,7 @@ export const RescueDetailPage = () => {
                   isLoading={cancelRescueMutation.isPending}
                   startContent={<XCircle className="w-4 h-4" />}
                 >
-                  Cancel Campaign
+                  Hủy Chiến Dịch
                 </Button>
               </ModalFooter>
             </>
@@ -780,7 +784,7 @@ export const RescueDetailPage = () => {
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-6 h-6 text-green-500" />
                   <h2 className="text-2xl font-bold">
-                    Complete Rescue Campaign
+                    Hoàn Thành Chiến Dịch Cứu Hộ
                   </h2>
                 </div>
               </ModalHeader>
@@ -788,23 +792,30 @@ export const RescueDetailPage = () => {
                 <div className="space-y-4">
                   <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                     <p className="text-sm text-green-800">
-                      <strong>This will:</strong>
+                      <strong>Hành động này sẽ:</strong>
                     </p>
                     <ul className="list-disc list-inside text-sm text-green-800 mt-2 space-y-1">
-                      <li>Mark the rescue as "Completed"</li>
-                      <li>Update all successful reports to "Resolved"</li>
-                      <li>Return cancelled/incomplete reports to "Pending"</li>
-                      <li>Notify all participants of completion</li>
+                      <li>Đánh dấu cứu hộ là "Hoàn Thành"</li>
+                      <li>
+                        Cập nhật tất cả báo cáo thành công thành "Đã Giải Quyết"
+                      </li>
+                      <li>
+                        Trả lại báo cáo bị hủy/chưa hoàn thành về "Đang Chờ Xử
+                        Lý"
+                      </li>
+                      <li>
+                        Thông báo cho tất cả người tham gia về việc hoàn thành
+                      </li>
                     </ul>
                   </div>
                   <p className="text-gray-700">
-                    Are you sure you want to complete this rescue campaign?
+                    Bạn có chắc chắn muốn hoàn thành chiến dịch cứu hộ này?
                   </p>
                 </div>
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={onClose}>
-                  Cancel
+                  Hủy
                 </Button>
                 <Button
                   color="success"
@@ -812,7 +823,7 @@ export const RescueDetailPage = () => {
                   isLoading={completeRescueMutation.isPending}
                   startContent={<CheckCircle className="w-4 h-4" />}
                 >
-                  Complete Campaign
+                  Hoàn Thành Chiến Dịch
                 </Button>
               </ModalFooter>
             </>
@@ -832,7 +843,9 @@ export const RescueDetailPage = () => {
               <ModalHeader>
                 <div className="flex items-center gap-2">
                   <Save className="w-6 h-6 text-blue-500" />
-                  <h2 className="text-2xl font-bold">Update Report Progress</h2>
+                  <h2 className="text-2xl font-bold">
+                    Cập Nhật Tiến Độ Báo Cáo
+                  </h2>
                 </div>
               </ModalHeader>
               <ModalBody>
@@ -842,13 +855,14 @@ export const RescueDetailPage = () => {
                       {selectedReportProgress?.reportTitle}
                     </p>
                     <p className="text-sm text-gray-600 mt-1">
-                      Current status: {selectedReportProgress?.currentStatus}
+                      Trạng thái hiện tại:{" "}
+                      {selectedReportProgress?.currentStatus}
                     </p>
                   </div>
 
                   <Select
-                    label="New Status"
-                    placeholder="Select status"
+                    label="Trạng Thái Mới"
+                    placeholder="Chọn trạng thái"
                     selectedKeys={[progressStatus]}
                     onChange={(e) =>
                       setProgressStatus(
@@ -860,19 +874,19 @@ export const RescueDetailPage = () => {
                     }
                   >
                     <SelectItem key="in_progress" value="in_progress">
-                      In Progress
+                      Đang Thực Hiện
                     </SelectItem>
                     <SelectItem key="success" value="success">
-                      Success (Rescued)
+                      Thành Công (Đã Cứu)
                     </SelectItem>
                     <SelectItem key="cancelled" value="cancelled">
-                      Cancelled
+                      Đã Hủy
                     </SelectItem>
                   </Select>
 
                   <Textarea
-                    label="Progress Note"
-                    placeholder="Add a note about the progress..."
+                    label="Ghi Chú Tiến Độ"
+                    placeholder="Thêm ghi chú về tiến độ..."
                     value={progressNote}
                     onValueChange={setProgressNote}
                     minRows={3}
@@ -881,7 +895,7 @@ export const RescueDetailPage = () => {
               </ModalBody>
               <ModalFooter>
                 <Button variant="light" onPress={onClose}>
-                  Cancel
+                  Hủy
                 </Button>
                 <Button
                   color="primary"
@@ -889,7 +903,7 @@ export const RescueDetailPage = () => {
                   isLoading={updateProgressMutation.isPending}
                   startContent={<Save className="w-4 h-4" />}
                 >
-                  Update Progress
+                  Cập Nhật Tiến Độ
                 </Button>
               </ModalFooter>
             </>
