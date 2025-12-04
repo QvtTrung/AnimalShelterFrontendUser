@@ -10,8 +10,6 @@ import {
   Pagination,
   Select,
   SelectItem,
-  Switch,
-  Slider,
 } from "@nextui-org/react";
 import { Link } from "react-router-dom";
 import {
@@ -23,12 +21,11 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  Navigation,
 } from "lucide-react";
 import { useMyAdoptions } from "../hooks/useAdoptions";
 import { useMyReports } from "../hooks/useReports";
 import { useMyRescues } from "../hooks/useRescues";
-import { useDashboardStats, useNearbyReports } from "../hooks/useDashboard";
+import { useDashboardStats } from "../hooks/useDashboard";
 import type { Adoption, Report, Rescue, Pet } from "../types";
 
 export const DashboardPage = () => {
@@ -38,7 +35,6 @@ export const DashboardPage = () => {
   const [adoptionsPage, setAdoptionsPage] = useState(1);
   const [reportsPage, setReportsPage] = useState(1);
   const [rescuesPage, setRescuesPage] = useState(1);
-  const [nearbyPage, setNearbyPage] = useState(1);
   const itemsPerPage = 5;
 
   // Filter states
@@ -47,61 +43,12 @@ export const DashboardPage = () => {
   const [reportsStatusFilter, setReportsStatusFilter] = useState<string>("");
   const [rescuesStatusFilter, setRescuesStatusFilter] = useState<string>("");
 
-  // Nearby reports states - persist location enabled state
-  const [userLocation, setUserLocation] = useState<
-    { latitude: number; longitude: number } | undefined
-  >();
-  const [locationEnabled, setLocationEnabled] = useState(() => {
-    // Restore from localStorage
-    const saved = localStorage.getItem("dashboard-location-enabled");
-    return saved === "true";
-  });
-  const [searchRadius, setSearchRadius] = useState(() => {
-    // Restore from localStorage
-    const saved = localStorage.getItem("dashboard-search-radius");
-    return saved ? parseInt(saved) : 25000;
-  }); // 25km default
-
-  // Save location preferences to localStorage
-  useEffect(() => {
-    localStorage.setItem(
-      "dashboard-location-enabled",
-      locationEnabled.toString()
-    );
-  }, [locationEnabled]);
-
-  useEffect(() => {
-    localStorage.setItem("dashboard-search-radius", searchRadius.toString());
-  }, [searchRadius]);
-
-  // Request user location
-  useEffect(() => {
-    if (locationEnabled && !userLocation) {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            setUserLocation({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            });
-          },
-          (error) => {
-            console.error("Error getting location:", error);
-            setLocationEnabled(false);
-          }
-        );
-      }
-    }
-  }, [locationEnabled, userLocation]);
-
   // Fetch user's data using the correct /me endpoints
   const { data: adoptionsResponse, isLoading: adoptionsLoading } =
     useMyAdoptions();
   const { data: reportsResponse, isLoading: reportsLoading } = useMyReports();
   const { data: rescuesResponse, isLoading: rescuesLoading } = useMyRescues();
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
-  const { data: nearbyReportsData, isLoading: nearbyLoading } =
-    useNearbyReports(userLocation, searchRadius, locationEnabled);
 
   // Extract data from API responses - use useMemo to prevent recreating arrays on every render
   const adoptionsData = useMemo(
@@ -115,10 +62,6 @@ export const DashboardPage = () => {
   const rescuesData = useMemo(
     () => rescuesResponse?.data || [],
     [rescuesResponse?.data]
-  );
-  const nearbyReports = useMemo(
-    () => nearbyReportsData || [],
-    [nearbyReportsData]
   );
 
   // Debug: Log first adoption to check data structure
@@ -166,13 +109,6 @@ export const DashboardPage = () => {
   );
   const totalReportsPages = Math.ceil(filteredReports.length / itemsPerPage);
   const totalRescuesPages = Math.ceil(filteredRescues.length / itemsPerPage);
-  const totalNearbyPages = Math.ceil(nearbyReports.length / itemsPerPage);
-
-  // Paginate nearby reports
-  const paginatedNearbyReports = nearbyReports.slice(
-    (nearbyPage - 1) * itemsPerPage,
-    nearbyPage * itemsPerPage
-  );
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -784,235 +720,6 @@ export const DashboardPage = () => {
                     )}
                   </div>
                 )}
-              </Tab>
-
-              {/* Nearby Reports Tab */}
-              <Tab
-                key="nearby"
-                title={
-                  <div className="flex items-center gap-2">
-                    <Navigation className="w-4 h-4" />
-                    Báo Cáo Gần Đây
-                  </div>
-                }
-              >
-                <div className="space-y-4">
-                  {/* Location Controls */}
-                  <Card className="border-2 border-primary-200 bg-primary-50">
-                    <CardBody className="p-4">
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                              <Navigation className="w-5 h-5 text-primary-600" />
-                              Bật Vị Trí
-                            </h4>
-                            <p className="text-sm text-gray-600 mt-1">
-                              Chia sẻ vị trí để tìm báo cáo động vật gần bạn
-                            </p>
-                          </div>
-                          <Switch
-                            isSelected={locationEnabled}
-                            onValueChange={setLocationEnabled}
-                            color="primary"
-                          />
-                        </div>
-
-                        {locationEnabled && userLocation && (
-                          <div className="space-y-3">
-                            <div className="flex items-center gap-2 text-sm text-success-600">
-                              <CheckCircle className="w-4 h-4" />
-                              Đã phát hiện vị trí:{" "}
-                              {userLocation.latitude.toFixed(4)},{" "}
-                              {userLocation.longitude.toFixed(4)}
-                            </div>
-
-                            <div>
-                              <label className="text-sm font-semibold text-gray-700 mb-2 block">
-                                Bán Kính Tìm Kiếm:{" "}
-                                {(searchRadius / 1000).toFixed(0)} km
-                              </label>
-                              <Slider
-                                aria-label="Search radius in kilometers"
-                                size="sm"
-                                step={5000}
-                                minValue={5000}
-                                maxValue={100000}
-                                value={searchRadius}
-                                onChange={(value) => {
-                                  setSearchRadius(
-                                    Array.isArray(value) ? value[0] : value
-                                  );
-                                  setNearbyPage(1);
-                                }}
-                                className="max-w-md"
-                                color="primary"
-                              />
-                            </div>
-                          </div>
-                        )}
-
-                        {locationEnabled && !userLocation && (
-                          <div className="flex items-center gap-2 text-sm text-warning-600">
-                            <Clock className="w-4 h-4" />
-                            Đang yêu cầu quyền truy cập vị trí...
-                          </div>
-                        )}
-                      </div>
-                    </CardBody>
-                  </Card>
-
-                  {/* Nearby Reports List */}
-                  {!locationEnabled ? (
-                    <div className="text-center py-12">
-                      <Navigation className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-500 mb-4">
-                        Bật chia sẻ vị trí để xem báo cáo động vật gần bạn
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        Vị trí của bạn chỉ được sử dụng để tìm báo cáo gần bạn
-                      </p>
-                    </div>
-                  ) : nearbyLoading ? (
-                    <div className="flex justify-center py-12">
-                      <Spinner size="lg" color="primary" />
-                    </div>
-                  ) : nearbyReports.length === 0 ? (
-                    <div className="text-center py-12">
-                      <AlertTriangle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-500 mb-2">
-                        Không tìm thấy báo cáo trong vòng{" "}
-                        {(searchRadius / 1000).toFixed(0)} km
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        Thử tăng bán kính tìm kiếm
-                      </p>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex justify-between items-center">
-                        <p className="text-sm text-gray-600">
-                          Tìm thấy {nearbyReports.length} báo cáo gần đây
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          Hiển thị {paginatedNearbyReports.length} trong số{" "}
-                          {nearbyReports.length}
-                        </p>
-                      </div>
-
-                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                      {paginatedNearbyReports.map((report: any) => (
-                        <Card
-                          key={report.id}
-                          className="border hover:border-primary-300 transition-colors"
-                        >
-                          <CardBody className="p-5">
-                            <div className="space-y-3">
-                              <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                  <div className="flex items-start gap-3">
-                                    {report.images?.[0]?.image_url && (
-                                      <img
-                                        src={report.images[0].image_url}
-                                        alt={report.title}
-                                        className="w-20 h-20 object-cover rounded-lg"
-                                      />
-                                    )}
-                                    <div className="flex-1">
-                                      <h3 className="text-lg font-bold text-gray-900">
-                                        {report.title || "Animal Report"}
-                                      </h3>
-                                      <p className="text-sm text-gray-600">
-                                        {report.species || report.type}
-                                      </p>
-                                      <div className="flex items-center gap-2 mt-1">
-                                        <Chip
-                                          size="sm"
-                                          color="primary"
-                                          variant="flat"
-                                        >
-                                          Cách {report.distance_km} km
-                                        </Chip>
-                                        <Chip
-                                          size="sm"
-                                          color={getStatusColor(report.status)}
-                                          variant="flat"
-                                        >
-                                          {report.status}
-                                        </Chip>
-                                        <Chip
-                                          size="sm"
-                                          color={
-                                            report.urgency_level ===
-                                              "critical" ||
-                                            report.urgency_level === "high"
-                                              ? "danger"
-                                              : report.urgency_level ===
-                                                "medium"
-                                              ? "warning"
-                                              : "default"
-                                          }
-                                          variant="flat"
-                                        >
-                                          {report.urgency_level}
-                                        </Chip>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {report.location && (
-                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                  <MapPin className="w-4 h-4" />
-                                  {report.location}
-                                </div>
-                              )}
-
-                              {report.description && (
-                                <p className="text-sm text-gray-700 line-clamp-2">
-                                  {report.description}
-                                </p>
-                              )}
-
-                              <div className="flex items-center justify-between mt-4">
-                                <div className="flex items-center gap-2 text-sm text-gray-500">
-                                  <Calendar className="w-4 h-4" />
-                                  {new Date(
-                                    report.date_created
-                                  ).toLocaleDateString()}
-                                </div>
-                                <Button
-                                  as={Link}
-                                  to={`/reports/${report.id}`}
-                                  color="primary"
-                                  size="sm"
-                                  variant="flat"
-                                  className="font-semibold"
-                                >
-                                  Xem Chi Tiết
-                                </Button>
-                              </div>
-                            </div>
-                          </CardBody>
-                        </Card>
-                      ))}
-
-                      {/* Pagination */}
-                      {totalNearbyPages > 1 && (
-                        <div className="flex justify-center mt-6">
-                          <Pagination
-                            total={totalNearbyPages}
-                            page={nearbyPage}
-                            onChange={setNearbyPage}
-                            showControls
-                            color="primary"
-                          />
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
               </Tab>
             </Tabs>
           </CardBody>

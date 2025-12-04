@@ -61,7 +61,7 @@ export const ReportMap = ({ title, location, coordinates }: ReportMapProps) => {
             center={[lat, lng]}
             zoom={15}
             style={{ height: "100%", width: "100%" }}
-            scrollWheelZoom={false}
+            scrollWheelZoom={true}
             zoomControl={true}
           >
             <TileLayer

@@ -126,3 +126,17 @@ export const useUploadReportImages = () => {
     },
   });
 };
+
+export const useDeleteReportImage = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ reportId, imageId }: { reportId: string; imageId: string }) => {
+      return apiClient.delete<ApiResponse<any>>(`/reports/${reportId}/images/${imageId}`);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['report', variables.reportId] });
+      queryClient.invalidateQueries({ queryKey: ['my-reports'] });
+    },
+  });
+};

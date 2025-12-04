@@ -246,7 +246,7 @@ export const ReportDetailPage = () => {
               </Card>
 
               {/* Images - Consistent layout for 1-5 images */}
-              {report.images && report.images.length > 0 && (
+              {report.images && report.images.length > 0 ? (
                 <Card className="shadow-sm">
                   <CardBody className="p-4">
                     <div
@@ -279,6 +279,14 @@ export const ReportDetailPage = () => {
                         </div>
                       ))}
                     </div>
+                  </CardBody>
+                </Card>
+              ) : (
+                <Card className="shadow-sm">
+                  <CardBody className="p-4">
+                    <p className="text-center text-gray-500 py-4">
+                      Không có hình ảnh được cung cấp cho báo cáo này.
+                    </p>
                   </CardBody>
                 </Card>
               )}
