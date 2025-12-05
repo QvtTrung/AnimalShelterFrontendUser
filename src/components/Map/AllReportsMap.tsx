@@ -124,14 +124,14 @@ export const AllReportsMap = ({
   };
 
   return (
-    <Card className="shadow-lg relative z-0">
+    <Card className="shadow-lg border-2 border-gray-200 relative z-0">
       <CardBody className="p-0 relative z-0">
         {isLoading && (
           <div className="absolute inset-0 z-10 bg-white/80 flex items-center justify-center">
             <Spinner size="lg" color="primary" />
           </div>
         )}
-        <div className="h-[500px] w-full rounded-lg overflow-hidden">
+        <div className="h-[450px] w-full rounded-lg overflow-hidden">
           <MapContainer
             center={center}
             zoom={12}

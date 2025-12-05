@@ -234,22 +234,25 @@ export const ReportsPage = () => {
       </section>
 
       {/* Map Section - Show all reports on map */}
-      <section className="py-8 bg-white border-b mt-0 pt-8">
+      <section className="py-8 bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-4">
-            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <MapPin className="w-6 h-6 text-primary-600" />
+          <div className="mb-6 text-center">
+            <h2 className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-2 mb-2">
+              <MapPin className="w-7 h-7 text-primary-600" />
               Bản Đồ Báo Cáo
             </h2>
-            <p className="text-gray-600 mt-1">
-              Xem tất cả các báo cáo động vật cần giúp đỡ trên bản đồ
+            <p className="text-gray-600">
+              Xem các báo cáo chờ xử lý trên bản đồ - Chỉ hiển thị báo cáo đang
+              chờ giúp đỡ
             </p>
           </div>
-          <AllReportsMap
-            reports={allReports}
-            isLoading={mapLoading}
-            center={[10.0452, 105.7469]}
-          />
+          <div className="max-w-5xl mx-auto">
+            <AllReportsMap
+              reports={allReports}
+              isLoading={mapLoading}
+              center={[10.0452, 105.7469]}
+            />
+          </div>
         </div>
       </section>
 
