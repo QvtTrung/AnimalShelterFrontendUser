@@ -242,8 +242,7 @@ export const ReportsPage = () => {
               Bản Đồ Báo Cáo
             </h2>
             <p className="text-gray-600">
-              Xem các báo cáo chờ xử lý trên bản đồ - Chỉ hiển thị báo cáo đang
-              chờ giúp đỡ
+              Xem các báo cáo về động vật cần được giúp đỡ
             </p>
           </div>
           <div className="max-w-5xl mx-auto">

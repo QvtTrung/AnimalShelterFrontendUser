@@ -183,7 +183,7 @@ export const RescuesPage = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-3">
             <h1 className="text-4xl md:text-5xl font-heading font-bold">
               Chiến Dịch Cứu Hộ
@@ -198,7 +198,7 @@ export const RescuesPage = () => {
 
       {/* Main Content - Map and Rescue List Side by Side */}
       <section className="py-8 bg-gradient-to-br from-blue-50 via-gray-50 to-blue-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           {currentLoading && (
             <div className="flex justify-center items-center py-20">
               <Spinner size="lg" color="primary" />
@@ -229,8 +229,8 @@ export const RescuesPage = () => {
             <Card className="shadow-xl border-2 border-blue-200 bg-white relative z-0">
               <CardBody className="p-6">
                 <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
-                  {/* Map Section - 6 columns */}
-                  <div className="lg:col-span-6">
+                  {/* Map Section - 7 columns */}
+                  <div className="lg:col-span-7">
                     <Card className="shadow-md border border-gray-200 h-full relative z-0">
                       <CardBody className="p-4">
                         <div className="mb-4">
@@ -244,7 +244,7 @@ export const RescuesPage = () => {
                               : "Chọn một chiến dịch để xem các báo cáo trên bản đồ"}
                           </p>
                         </div>
-                        <div className="h-[450px]">
+                        <div className="h-[600px]">
                           <InteractiveRescueMap
                             reports={selectedReports}
                             isLoading={false}
@@ -254,8 +254,8 @@ export const RescuesPage = () => {
                     </Card>
                   </div>
 
-                  {/* Rescue List Section - 4 columns */}
-                  <div className="lg:col-span-4">
+                  {/* Rescue List Section - 3 columns */}
+                  <div className="lg:col-span-3">
                     <Card className="shadow-md border border-gray-200 h-full">
                       <CardBody className="p-4">
                         <div className="mb-4">
@@ -302,7 +302,7 @@ export const RescuesPage = () => {
 
                         <Divider className="my-4" />
 
-                        <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2">
+                        <div className="space-y-3 max-h-[480px] overflow-y-auto pr-2">
                           <Accordion
                             selectionMode="single"
                             variant="splitted"
@@ -423,7 +423,7 @@ export const RescuesPage = () => {
 
       {/* Tabs Section */}
       <section className="bg-white shadow-md z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <Tabs
             selectedKey={selectedTab}
             onSelectionChange={(key) => {
@@ -450,7 +450,7 @@ export const RescuesPage = () => {
 
       {/* Table List Section */}
       <section className="py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               Tất Cả Chiến Dịch Cứu Hộ

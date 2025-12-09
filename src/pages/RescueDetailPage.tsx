@@ -271,7 +271,7 @@ export const RescueDetailPage = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Button
             as={Link}
             to="/rescues"
@@ -284,126 +284,141 @@ export const RescueDetailPage = () => {
       </div>
 
       {/* Content */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="space-y-6">
-          {/* Title and Status */}
-          <div>
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <h1 className="text-4xl font-heading font-bold text-gray-900 mb-2">
-                  {rescue.title}
-                </h1>
-                <p className="text-xl text-gray-600">Chiến Dịch Cứu Hộ</p>
-              </div>
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Title and Status - Full Width */}
+        <div className="mb-6">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex-1">
+              <h1 className="text-4xl font-heading font-bold text-gray-900 mb-2">
+                {rescue.title}
+              </h1>
+              <p className="text-xl text-gray-600">Chiến Dịch Cứu Hộ</p>
             </div>
-
-            <div className="flex flex-wrap gap-3 mb-6">
-              <Chip
-                color={getStatusColor(rescue.status)}
-                size="lg"
-                variant="flat"
-              >
-                {rescue.status}
-              </Chip>
-              {isFull && (
-                <Chip color="danger" size="lg" variant="flat">
-                  Đầy - Không Còn Chỗ
-                </Chip>
-              )}
-              {isLeader && (
-                <Chip color="success" size="lg" variant="flat">
-                  Bạn Là Trưởng Nhóm
-                </Chip>
-              )}
-              {isMember && (
-                <Chip color="primary" size="lg" variant="flat">
-                  Bạn Là Thành Viên
-                </Chip>
-              )}
-            </div>
-
-            {/* Info message for members */}
-            {isMember &&
-              (rescue.status === "planned" ||
-                rescue.status === "in_progress") && (
-                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm text-blue-800">
-                    <strong>Lưu ý:</strong> Bạn là thành viên của chiến dịch cứu
-                    hộ này. Chỉ có trưởng nhóm mới có thể bắt đầu, hoàn thành,
-                    hủy chiến dịch hoặc cập nhật tiến độ báo cáo.
-                  </p>
-                </div>
-              )}
           </div>
 
-          {/* Description */}
-          <Card>
-            <CardBody className="p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-3">
-                Giới Thiệu Chiến Dịch
-              </h2>
-              <p className="text-gray-700 leading-relaxed">
-                {rescue.description ||
-                  "Tham gia chiến dịch cứu hộ này để giúp cứu các động vật cần giúp đỡ. Sự tham gia của bạn tạo nên sự khác biệt thật sự."}
-              </p>
-            </CardBody>
-          </Card>
+          <div className="flex flex-wrap gap-3 mb-6">
+            <Chip
+              color={getStatusColor(rescue.status)}
+              size="lg"
+              variant="flat"
+            >
+              {rescue.status}
+            </Chip>
+            {isFull && (
+              <Chip color="danger" size="lg" variant="flat">
+                Đầy - Không Còn Chỗ
+              </Chip>
+            )}
+            {isLeader && (
+              <Chip color="success" size="lg" variant="flat">
+                Bạn Là Trưởng Nhóm
+              </Chip>
+            )}
+            {isMember && (
+              <Chip color="primary" size="lg" variant="flat">
+                Bạn Là Thành Viên
+              </Chip>
+            )}
+          </div>
 
-          {/* Campaign Details */}
+          {/* Info message for members */}
+          {isMember &&
+            (rescue.status === "planned" ||
+              rescue.status === "in_progress") && (
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Lưu ý:</strong> Bạn là thành viên của chiến dịch cứu
+                  hộ này. Chỉ có trưởng nhóm mới có thể bắt đầu, hoàn thành, hủy
+                  chiến dịch hoặc cập nhật tiến độ báo cáo.
+                </p>
+              </div>
+            )}
+        </div>
+
+        {/* Single Column Layout */}
+        <div className="space-y-6">
+          {/* Campaign Information - Merged Component */}
           <Card>
             <CardBody className="p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
-                Chi Tiết Chiến Dịch
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                Thông Tin Chiến Dịch
               </h2>
-              <div className="space-y-4">
-                {/* Start Date */}
-                <div className="flex items-center gap-3">
-                  <Calendar className="w-5 h-5 text-gray-500" />
-                  <div>
-                    <p className="text-sm text-gray-500">Ngày Bắt Đầu</p>
-                    <p className="text-gray-700 font-medium">
-                      {rescue.start_date
-                        ? new Date(rescue.start_date).toLocaleDateString(
+
+              {/* Description Section */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                  Giới Thiệu
+                </h3>
+                <p className="text-gray-700 leading-relaxed">
+                  {rescue.description ||
+                    "Tham gia chiến dịch cứu hộ này để giúp cứu các động vật cần giúp đỡ. Sự tham gia của bạn tạo nên sự khác biệt thật sự."}
+                </p>
+              </div>
+
+              {/* Details Grid */}
+              <div className="border-t pt-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  Chi Tiết
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Start Date */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex-shrink-0">
+                      <Calendar className="w-5 h-5 text-blue-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Ngày Bắt Đầu</p>
+                      <p className="text-gray-900 font-medium">
+                        {rescue.start_date
+                          ? new Date(rescue.start_date).toLocaleDateString(
+                              "vi-VN",
+                              {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              }
+                            )
+                          : "Sẽ thông báo sau"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* End Date */}
+                  {rescue.end_date && (
+                    <div className="flex items-center gap-3">
+                      <div className="flex-shrink-0">
+                        <Calendar className="w-5 h-5 text-blue-500" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">Ngày Kết Thúc</p>
+                        <p className="text-gray-900 font-medium">
+                          {new Date(rescue.end_date).toLocaleDateString(
                             "vi-VN",
                             {
                               year: "numeric",
                               month: "long",
                               day: "numeric",
                             }
-                          )
-                        : "Sẽ thông báo sau"}
-                    </p>
-                  </div>
-                </div>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  )}
 
-                {/* End Date */}
-                {rescue.end_date && (
+                  {/* Participants */}
                   <div className="flex items-center gap-3">
-                    <Calendar className="w-5 h-5 text-gray-500" />
+                    <div className="flex-shrink-0">
+                      <Users className="w-5 h-5 text-blue-500" />
+                    </div>
                     <div>
-                      <p className="text-sm text-gray-500">Ngày Kết Thúc</p>
-                      <p className="text-gray-700 font-medium">
-                        {new Date(rescue.end_date).toLocaleDateString("vi-VN", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
+                      <p className="text-sm text-gray-500">Người Tham Gia</p>
+                      <p className="text-gray-900 font-medium">
+                        {currentParticipants}
+                        {requiredParticipants > 0 &&
+                          ` / ${requiredParticipants}`}{" "}
+                        tình nguyện viên
                       </p>
                     </div>
-                  </div>
-                )}
-
-                {/* Participants */}
-                <div className="flex items-center gap-3">
-                  <Users className="w-5 h-5 text-gray-500" />
-                  <div>
-                    <p className="text-sm text-gray-500">Người Tham Gia</p>
-                    <p className="text-gray-700 font-medium">
-                      {currentParticipants}
-                      {requiredParticipants > 0 &&
-                        ` / ${requiredParticipants}`}{" "}
-                      tình nguyện viên
-                    </p>
                   </div>
                 </div>
               </div>
@@ -415,10 +430,10 @@ export const RescueDetailPage = () => {
             <>
               <Card>
                 <CardBody className="p-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-4">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">
                     Báo Cáo Liên Quan
                   </h2>
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {rescue.reports.map((rescueReport) => {
                       const reportId = rescueReport.report_id;
                       const reportIdStr =
@@ -429,50 +444,53 @@ export const RescueDetailPage = () => {
                       return (
                         <div
                           key={rescueReport.id}
-                          className="p-4 bg-gray-50 rounded-lg border border-gray-200"
+                          className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors"
                         >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <p className="font-medium text-gray-900">
-                                  {rescueReport.report?.title ||
-                                    `Báo cáo #${reportIdStr.substring(0, 8)}`}
-                                </p>
-                                <Chip
-                                  size="sm"
-                                  color={
-                                    rescueReport.status === "success"
-                                      ? "success"
-                                      : rescueReport.status === "cancelled"
-                                      ? "danger"
-                                      : "warning"
-                                  }
-                                >
-                                  {rescueReport.status}
-                                </Chip>
-                              </div>
-                              {rescueReport.note && (
-                                <p className="text-sm text-gray-500 mb-1">
-                                  {rescueReport.note}
-                                </p>
-                              )}
-                              {rescueReport.report?.location && (
-                                <p className="text-sm text-gray-500">
-                                  📍 {rescueReport.report.location}
-                                </p>
-                              )}
+                          <div className="flex flex-col gap-3">
+                            <div className="flex items-center justify-between">
+                              <p className="font-semibold text-gray-900">
+                                {rescueReport.report?.title ||
+                                  `Báo cáo #${reportIdStr.substring(0, 8)}`}
+                              </p>
+                              <Chip
+                                size="sm"
+                                color={
+                                  rescueReport.status === "success"
+                                    ? "success"
+                                    : rescueReport.status === "cancelled"
+                                    ? "danger"
+                                    : "warning"
+                                }
+                              >
+                                {rescueReport.status === "in_progress"
+                                  ? "Đang Xử Lý"
+                                  : rescueReport.status === "success"
+                                  ? "Thành Công"
+                                  : "Đã Hủy"}
+                              </Chip>
                             </div>
-                            <div className="flex gap-2">
+                            {rescueReport.note && (
+                              <p className="text-sm text-gray-600">
+                                {rescueReport.note}
+                              </p>
+                            )}
+                            {rescueReport.report?.location && (
+                              <p className="text-sm text-gray-500">
+                                📍 {rescueReport.report.location}
+                              </p>
+                            )}
+                            <div className="flex gap-2 mt-2">
                               {isLeader && rescue.status === "in_progress" && (
                                 <Button
                                   size="sm"
                                   variant="flat"
                                   color="primary"
+                                  className="flex-1"
                                   onPress={() =>
                                     handleOpenProgressModal(rescueReport)
                                   }
                                 >
-                                  Cập Nhật Tiến Độ
+                                  Cập Nhật
                                 </Button>
                               )}
                               <Button
@@ -481,8 +499,9 @@ export const RescueDetailPage = () => {
                                 size="sm"
                                 variant="flat"
                                 color="default"
+                                className="flex-1"
                               >
-                                Xem Báo Cáo
+                                Xem Chi Tiết
                               </Button>
                             </div>
                           </div>
@@ -496,15 +515,17 @@ export const RescueDetailPage = () => {
               {/* Map with Report Locations */}
               <Card className="relative z-0">
                 <CardBody className="p-0">
-                  <div className="h-[500px] rounded-lg overflow-hidden relative z-0">
+                  <div className="h-[600px] rounded-lg overflow-hidden relative z-0">
                     <RescueMap reports={rescue.reports} />
                   </div>
                 </CardBody>
               </Card>
             </>
           )}
+        </div>
 
-          {/* Action Buttons */}
+        {/* Action Buttons - Full Width Below Grid */}
+        <div className="mt-6 space-y-4">
           {isLeader && rescue.status === "planned" && (
             <div className="flex flex-col sm:flex-row gap-3">
               <Button

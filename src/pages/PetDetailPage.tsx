@@ -233,7 +233,7 @@ export const PetDetailPage = () => {
                 <h2 className="text-xl font-bold text-gray-900 mb-3">
                   Về {pet.name}
                 </h2>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
                   {pet.description ||
                     `${pet.name} là một ${pet.species} tuyệt vời đang tìm kiếm một ngôi nhà ấm áp. Người bạn đáng yêu này đang chờ để mang niềm vui đến gia đình bạn!`}
                 </p>
