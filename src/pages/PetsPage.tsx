@@ -16,6 +16,7 @@ import {
 import { Search, MapPin, Heart, Calendar, PawPrint } from "lucide-react";
 import { usePets } from "../hooks/usePets";
 import type { Pet } from "../types";
+import { translatePetSpecies, translatePetStatus } from "../utils/translations";
 
 export const PetsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -255,7 +256,7 @@ export const PetsPage = () => {
                     className="absolute top-4 right-4 backdrop-blur-sm bg-white/90 shadow-lg font-semibold"
                     variant="flat"
                   >
-                    {pet.status}
+                    {translatePetStatus(pet.status)}
                   </Chip>
                 </CardHeader>
                 <CardBody className="p-5 space-y-3">
@@ -264,8 +265,8 @@ export const PetsPage = () => {
                       <h3 className="text-xl font-bold text-gray-900">
                         {pet.name}
                       </h3>
-                      <p className="text-sm text-gray-500 capitalize">
-                        {pet.species}
+                      <p className="text-sm text-gray-500">
+                        {translatePetSpecies(pet.species)}
                       </p>
                     </div>
                     <Button

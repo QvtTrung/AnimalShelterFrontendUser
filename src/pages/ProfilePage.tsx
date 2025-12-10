@@ -9,9 +9,23 @@ import {
   Avatar,
   Spinner,
 } from "@nextui-org/react";
-import { User, Mail, Phone, MapPin, Calendar, ArrowLeft } from "lucide-react";
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  ArrowLeft,
+  Lock,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { useAuthStore } from "../store/auth.store";
-import { useCurrentUser, useUpdateProfile } from "../hooks/useAuth";
+import {
+  useCurrentUser,
+  useUpdateProfile,
+  useChangePassword,
+} from "../hooks/useAuth";
 import toast from "react-hot-toast";
 
 export const ProfilePage = () => {
@@ -19,7 +33,12 @@ export const ProfilePage = () => {
   const { user: storeUser } = useAuthStore();
   const { data: userData, isLoading, refetch } = useCurrentUser();
   const updateProfileMutation = useUpdateProfile();
+  const changePasswordMutation = useChangePassword();
   const [isEditing, setIsEditing] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const user = userData?.data || storeUser;
 
@@ -30,8 +49,18 @@ export const ProfilePage = () => {
     address: user?.address || "",
   });
 
+  const [passwordData, setPasswordData] = useState({
+    current_password: "",
+    new_password: "",
+    confirm_password: "",
+  });
+
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handlePasswordChange = (field: string, value: string) => {
+    setPasswordData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = async () => {
@@ -44,6 +73,46 @@ export const ProfilePage = () => {
       console.error("Failed to update profile:", error);
       toast.error("Cập nhật hồ sơ thất bại. Vui lòng thử lại.");
     }
+  };
+
+  const handleChangePassword = async () => {
+    // Validate passwords match
+    if (passwordData.new_password !== passwordData.confirm_password) {
+      toast.error("Mật khẩu mới và xác nhận mật khẩu không khớp!");
+      return;
+    }
+
+    // Validate password length
+    if (passwordData.new_password.length < 8) {
+      toast.error("Mật khẩu mới phải có ít nhất 8 ký tự!");
+      return;
+    }
+
+    try {
+      await changePasswordMutation.mutateAsync(passwordData);
+      toast.success("Đổi mật khẩu thành công!");
+      setIsChangingPassword(false);
+      setPasswordData({
+        current_password: "",
+        new_password: "",
+        confirm_password: "",
+      });
+    } catch (error: any) {
+      console.error("Failed to change password:", error);
+      const errorMessage =
+        error?.response?.data?.message ||
+        "Đổi mật khẩu thất bại. Vui lòng thử lại.";
+      toast.error(errorMessage);
+    }
+  };
+
+  const handleCancelPasswordChange = () => {
+    setPasswordData({
+      current_password: "",
+      new_password: "",
+      confirm_password: "",
+    });
+    setIsChangingPassword(false);
   };
 
   const handleCancel = () => {
@@ -291,6 +360,150 @@ export const ProfilePage = () => {
                 </span>
               </div>
             </div>
+          </CardBody>
+        </Card>
+
+        {/* Change Password Card */}
+        <Card className="mt-6">
+          <CardHeader className="flex items-center justify-between p-6 pb-4">
+            <h3 className="text-xl font-bold text-gray-900">Đổi Mật Khẩu</h3>
+            {!isChangingPassword ? (
+              <Button
+                color="primary"
+                variant="flat"
+                onPress={() => setIsChangingPassword(true)}
+                startContent={<Lock className="w-4 h-4" />}
+              >
+                Đổi Mật Khẩu
+              </Button>
+            ) : (
+              <div className="flex gap-2">
+                <Button
+                  color="default"
+                  variant="light"
+                  onPress={handleCancelPasswordChange}
+                  isDisabled={changePasswordMutation.isPending}
+                >
+                  Hủy
+                </Button>
+                <Button
+                  color="primary"
+                  onPress={handleChangePassword}
+                  isLoading={changePasswordMutation.isPending}
+                >
+                  Lưu Mật Khẩu
+                </Button>
+              </div>
+            )}
+          </CardHeader>
+          <CardBody className="p-6 pt-2">
+            {isChangingPassword ? (
+              <div className="space-y-4">
+                <Input
+                  type={showCurrentPassword ? "text" : "password"}
+                  label="Mật Khẩu Hiện Tại"
+                  placeholder="Nhập mật khẩu hiện tại"
+                  value={passwordData.current_password}
+                  onChange={(e) =>
+                    handlePasswordChange("current_password", e.target.value)
+                  }
+                  startContent={<Lock className="w-4 h-4 text-gray-400" />}
+                  endContent={
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowCurrentPassword(!showCurrentPassword)
+                      }
+                      className="focus:outline-none"
+                    >
+                      {showCurrentPassword ? (
+                        <EyeOff className="w-4 h-4 text-gray-400" />
+                      ) : (
+                        <Eye className="w-4 h-4 text-gray-400" />
+                      )}
+                    </button>
+                  }
+                  variant="bordered"
+                  classNames={{
+                    input: "text-gray-900",
+                    label: "text-gray-700 font-medium",
+                  }}
+                />
+
+                <Input
+                  type={showNewPassword ? "text" : "password"}
+                  label="Mật Khẩu Mới"
+                  placeholder="Nhập mật khẩu mới (tối thiểu 8 ký tự)"
+                  value={passwordData.new_password}
+                  onChange={(e) =>
+                    handlePasswordChange("new_password", e.target.value)
+                  }
+                  startContent={<Lock className="w-4 h-4 text-gray-400" />}
+                  endContent={
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="focus:outline-none"
+                    >
+                      {showNewPassword ? (
+                        <EyeOff className="w-4 h-4 text-gray-400" />
+                      ) : (
+                        <Eye className="w-4 h-4 text-gray-400" />
+                      )}
+                    </button>
+                  }
+                  variant="bordered"
+                  classNames={{
+                    input: "text-gray-900",
+                    label: "text-gray-700 font-medium",
+                  }}
+                />
+
+                <Input
+                  type={showConfirmPassword ? "text" : "password"}
+                  label="Xác Nhận Mật Khẩu Mới"
+                  placeholder="Nhập lại mật khẩu mới"
+                  value={passwordData.confirm_password}
+                  onChange={(e) =>
+                    handlePasswordChange("confirm_password", e.target.value)
+                  }
+                  startContent={<Lock className="w-4 h-4 text-gray-400" />}
+                  endContent={
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="focus:outline-none"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="w-4 h-4 text-gray-400" />
+                      ) : (
+                        <Eye className="w-4 h-4 text-gray-400" />
+                      )}
+                    </button>
+                  }
+                  variant="bordered"
+                  classNames={{
+                    input: "text-gray-900",
+                    label: "text-gray-700 font-medium",
+                  }}
+                />
+
+                <div className="p-4 bg-blue-50 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    <strong>Lưu ý:</strong> Mật khẩu phải có ít nhất 8 ký tự.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 bg-gray-50 rounded-lg text-center">
+                <Lock className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                <p className="text-gray-600">
+                  Nhấn vào nút "Đổi Mật Khẩu" để thay đổi mật khẩu của bạn
+                </p>
+              </div>
+            )}
           </CardBody>
         </Card>
       </div>

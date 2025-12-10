@@ -38,6 +38,11 @@ import { AllReportsMap } from "../components/Map/AllReportsMap";
 import { ReportEditModal } from "../components/ReportEditModal";
 import type { Report } from "../types";
 import { useAuthStore } from "../store/auth.store";
+import {
+  translateReportSpecies,
+  translateReportStatus,
+  translateUrgencyLevel,
+} from "../utils/translations";
 
 export const ReportsPage = () => {
   const { user } = useAuthStore();
@@ -463,9 +468,9 @@ export const ReportsPage = () => {
                                 <Chip
                                   size="sm"
                                   variant="flat"
-                                  className="capitalize bg-gray-100"
+                                  className="bg-gray-100"
                                 >
-                                  {report.species}
+                                  {translateReportSpecies(report.species)}
                                 </Chip>
                                 <Chip
                                   size="sm"
@@ -479,9 +484,9 @@ export const ReportsPage = () => {
                                       : "default"
                                   }
                                   variant="solid"
-                                  className="font-bold capitalize"
+                                  className="font-bold"
                                 >
-                                  {report.urgency_level}
+                                  {translateUrgencyLevel(report.urgency_level)}
                                 </Chip>
                                 <Chip
                                   size="sm"
@@ -493,9 +498,8 @@ export const ReportsPage = () => {
                                       : "success"
                                   }
                                   variant="flat"
-                                  className="capitalize"
                                 >
-                                  {report.status}
+                                  {translateReportStatus(report.status)}
                                 </Chip>
                               </div>
                             </div>
@@ -698,9 +702,9 @@ export const ReportsPage = () => {
                                       <Chip
                                         size="sm"
                                         variant="flat"
-                                        className="capitalize bg-gray-100"
+                                        className="bg-gray-100"
                                       >
-                                        {report.species}
+                                        {translateReportSpecies(report.species)}
                                       </Chip>
                                       <Chip
                                         size="sm"
@@ -714,9 +718,11 @@ export const ReportsPage = () => {
                                             : "default"
                                         }
                                         variant="solid"
-                                        className="font-bold capitalize"
+                                        className="font-bold"
                                       >
-                                        {report.urgency_level}
+                                        {translateUrgencyLevel(
+                                          report.urgency_level
+                                        )}
                                       </Chip>
                                       <Chip
                                         size="sm"
@@ -728,9 +734,8 @@ export const ReportsPage = () => {
                                             : "success"
                                         }
                                         variant="flat"
-                                        className="capitalize"
                                       >
-                                        {report.status}
+                                        {translateReportStatus(report.status)}
                                       </Chip>
                                     </div>
                                   </div>
@@ -988,9 +993,9 @@ export const ReportsPage = () => {
                                       <Chip
                                         size="sm"
                                         variant="flat"
-                                        className="capitalize bg-gray-100"
+                                        className="bg-gray-100"
                                       >
-                                        {report.species}
+                                        {translateReportSpecies(report.species)}
                                       </Chip>
                                       <Chip
                                         size="sm"
@@ -1004,9 +1009,11 @@ export const ReportsPage = () => {
                                             : "default"
                                         }
                                         variant="solid"
-                                        className="font-bold capitalize"
+                                        className="font-bold"
                                       >
-                                        {report.urgency_level}
+                                        {translateUrgencyLevel(
+                                          report.urgency_level
+                                        )}
                                       </Chip>
                                       <Chip
                                         size="sm"
@@ -1018,9 +1025,8 @@ export const ReportsPage = () => {
                                             : "success"
                                         }
                                         variant="flat"
-                                        className="capitalize"
                                       >
-                                        {report.status}
+                                        {translateReportStatus(report.status)}
                                       </Chip>
                                     </div>
                                   </div>

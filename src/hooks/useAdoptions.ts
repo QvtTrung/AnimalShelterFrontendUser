@@ -9,6 +9,21 @@ interface AdoptionFilters {
   limit?: number;
 }
 
+interface CreateAdoptionData {
+  pet_id: string;
+  notes?: string;
+  full_name?: string;
+  phone_number?: string;
+  email?: string;
+  address?: string;
+  housing_type?: 'apartment' | 'house' | 'villa';
+  housing_area?: number;
+  has_yard?: boolean;
+  pet_experience?: string;
+  adoption_reason?: string;
+  care_commitment?: string;
+}
+
 export const useAdoptions = (filters?: AdoptionFilters, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ['adoptions', filters],
@@ -41,7 +56,7 @@ export const useCreateAdoption = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { pet_id: string; notes?: string }) =>
+    mutationFn: (data: CreateAdoptionData) =>
       apiClient.post<ApiResponse<Adoption>>('/adoptions', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adoptions'] });

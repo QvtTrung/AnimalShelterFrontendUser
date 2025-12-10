@@ -27,6 +27,11 @@ import { useMyReports } from "../hooks/useReports";
 import { useMyRescues } from "../hooks/useRescues";
 import { useDashboardStats } from "../hooks/useDashboard";
 import type { Adoption, Report, Rescue, Pet } from "../types";
+import {
+  translateReportSpecies,
+  translateReportStatus,
+  translateUrgencyLevel,
+} from "../utils/translations";
 
 export const DashboardPage = () => {
   const [selectedTab, setSelectedTab] = useState("adoptions");
@@ -488,7 +493,9 @@ export const DashboardPage = () => {
                                   {report.title || "Animal Report"}
                                 </h3>
                                 <p className="text-sm text-gray-600">
-                                  {report.species || report.type}
+                                  {translateReportSpecies(
+                                    report.species || report.type
+                                  )}
                                 </p>
                               </div>
                               <div className="flex gap-2">
@@ -497,7 +504,7 @@ export const DashboardPage = () => {
                                   variant="flat"
                                   size="sm"
                                 >
-                                  {report.status}
+                                  {translateReportStatus(report.status)}
                                 </Chip>
                                 <Chip
                                   color={
@@ -511,7 +518,7 @@ export const DashboardPage = () => {
                                   variant="flat"
                                   size="sm"
                                 >
-                                  {report.urgency_level}
+                                  {translateUrgencyLevel(report.urgency_level)}
                                 </Chip>
                               </div>
                             </div>

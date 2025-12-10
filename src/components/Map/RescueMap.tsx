@@ -3,6 +3,7 @@ import { Button } from "@nextui-org/react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { translateReportStatus } from "../../utils/translations";
 
 // Fix Leaflet default marker icon
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
@@ -73,7 +74,7 @@ export const RescueMap = ({ reports, className = "" }: RescueMapProps) => {
       <div
         className={`flex items-center justify-center bg-gray-100 ${className}`}
       >
-        <p className="text-gray-500">No report locations available</p>
+        <p className="text-gray-500">Không có vị trí báo cáo khả dụng</p>
       </div>
     );
   }
@@ -107,8 +108,10 @@ export const RescueMap = ({ reports, className = "" }: RescueMapProps) => {
                   </p>
                 )}
                 <p className="text-xs text-gray-500 mb-2">
-                  Status:{" "}
-                  <span className="font-medium">{rescueReport.status}</span>
+                  Trạng thái:{" "}
+                  <span className="font-medium">
+                    {translateReportStatus(rescueReport.status)}
+                  </span>
                 </p>
                 <Button
                   as={Link}
@@ -118,7 +121,7 @@ export const RescueMap = ({ reports, className = "" }: RescueMapProps) => {
                   variant="flat"
                   className="w-full"
                 >
-                  View Details
+                  Xem Chi Tiết
                 </Button>
               </div>
             </Popup>

@@ -26,6 +26,12 @@ interface UpdateProfileRequest {
   date_of_birth?: string;
 }
 
+interface ChangePasswordRequest {
+  current_password: string;
+  new_password: string;
+  confirm_password: string;
+}
+
 interface AuthResponse {
   directusUser: {
     id: string;
@@ -154,5 +160,12 @@ export const useUpdateProfile = () => {
       // Invalidate and refetch the current user query
       queryClient.invalidateQueries({ queryKey: ['current-user'] });
     },
+  });
+};
+
+export const useChangePassword = () => {
+  return useMutation({
+    mutationFn: (data: ChangePasswordRequest) =>
+      apiClient.post<ApiResponse<{ message: string }>>('/auth/change-password', data),
   });
 };

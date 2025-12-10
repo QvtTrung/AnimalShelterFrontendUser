@@ -12,6 +12,10 @@ import {
   ModalFooter,
   useDisclosure,
   Textarea,
+  Input,
+  Select,
+  SelectItem,
+  Checkbox,
 } from "@nextui-org/react";
 import {
   ArrowLeft,
@@ -25,14 +29,34 @@ import { useState } from "react";
 import { usePet } from "../hooks/usePets";
 import { useCreateAdoption } from "../hooks/useAdoptions";
 import { useAuthStore } from "../store/auth.store";
+import {
+  translatePetSpecies,
+  translatePetStatus,
+  translatePetSize,
+  translatePetGender,
+} from "../utils/translations";
 
 export const PetDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [adoptionNotes, setAdoptionNotes] = useState("");
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  // Adoption form state
+  const [formData, setFormData] = useState({
+    full_name: "",
+    phone_number: "",
+    email: "",
+    address: "",
+    housing_type: "",
+    housing_area: "",
+    has_yard: false,
+    pet_experience: "",
+    adoption_reason: "",
+    care_commitment: "",
+    notes: "",
+  });
 
   const { data: petData, isLoading, isError } = usePet(id || "");
   const createAdoption = useCreateAdoption();
@@ -50,13 +74,51 @@ export const PetDetailPage = () => {
   const handleSubmitAdoption = async () => {
     if (!pet) return;
 
+    // Validate required fields
+    if (
+      !formData.full_name ||
+      !formData.phone_number ||
+      !formData.email ||
+      !formData.address ||
+      !formData.housing_type ||
+      !formData.adoption_reason
+    ) {
+      alert("Vui lòng điền đầy đủ các trường bắt buộc (đánh dấu *)");
+      return;
+    }
+
     try {
       await createAdoption.mutateAsync({
         pet_id: pet.id,
-        notes: adoptionNotes || undefined,
+        full_name: formData.full_name,
+        phone_number: formData.phone_number,
+        email: formData.email,
+        address: formData.address,
+        housing_type: formData.housing_type as "apartment" | "house" | "villa",
+        housing_area: formData.housing_area
+          ? parseInt(formData.housing_area)
+          : undefined,
+        has_yard: formData.has_yard,
+        pet_experience: formData.pet_experience || undefined,
+        adoption_reason: formData.adoption_reason,
+        care_commitment: formData.care_commitment || undefined,
+        notes: formData.notes || undefined,
       });
       onOpenChange();
-      // Show success message
+      // Reset form
+      setFormData({
+        full_name: "",
+        phone_number: "",
+        email: "",
+        address: "",
+        housing_type: "",
+        housing_area: "",
+        has_yard: false,
+        pet_experience: "",
+        adoption_reason: "",
+        care_commitment: "",
+        notes: "",
+      });
       alert(
         "Đơn xin nhận nuôi đã gửi thành công! Chúng tôi sẽ liên hệ với bạn sớm."
       );
@@ -139,7 +201,7 @@ export const PetDetailPage = () => {
                 size="lg"
                 variant="flat"
               >
-                {pet.status}
+                {translatePetStatus(pet.status)}
               </Chip>
             </div>
 
@@ -175,8 +237,8 @@ export const PetDetailPage = () => {
                   <h1 className="text-4xl font-heading font-bold text-gray-900 mb-2">
                     {pet.name}
                   </h1>
-                  <p className="text-xl text-gray-600 capitalize">
-                    {pet.species}
+                  <p className="text-xl text-gray-600">
+                    {translatePetSpecies(pet.species)}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -207,12 +269,12 @@ export const PetDetailPage = () => {
                 )}
                 {pet.size && (
                   <Chip size="lg" variant="flat">
-                    {pet.size}
+                    {translatePetSize(pet.size)}
                   </Chip>
                 )}
                 {pet.gender && (
                   <Chip size="lg" variant="flat">
-                    {pet.gender}
+                    {translatePetGender(pet.gender)}
                   </Chip>
                 )}
                 {pet.location && (
@@ -235,7 +297,9 @@ export const PetDetailPage = () => {
                 </h2>
                 <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
                   {pet.description ||
-                    `${pet.name} là một ${pet.species} tuyệt vời đang tìm kiếm một ngôi nhà ấm áp. Người bạn đáng yêu này đang chờ để mang niềm vui đến gia đình bạn!`}
+                    `${pet.name} là một ${translatePetSpecies(
+                      pet.species
+                    ).toLowerCase()} tuyệt vời đang tìm kiếm một ngôi nhà ấm áp. Người bạn đáng yêu này đang chờ để mang niềm vui đến gia đình bạn!`}
                 </p>
               </CardBody>
             </Card>
@@ -302,33 +366,212 @@ export const PetDetailPage = () => {
       </div>
 
       {/* Adoption Modal */}
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        size="3xl"
+        scrollBehavior="inside"
+      >
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                <h2 className="text-2xl font-bold">Nhận Nuôi {pet.name}</h2>
+                <h2 className="text-2xl font-bold">
+                  Đơn Xin Nhận Nuôi {pet.name}
+                </h2>
                 <p className="text-sm text-gray-600 font-normal">
-                  Điền vào biểu mẫu này để bắt đầu quá trình nhận nuôi
+                  Vui lòng điền đầy đủ thông tin để chúng tôi có thể xem xét đơn
+                  của bạn
                 </p>
               </ModalHeader>
-              <ModalBody>
-                <div className="space-y-4">
+              <ModalBody className="py-6">
+                <div className="space-y-6">
+                  {/* Info Banner */}
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p className="text-sm text-blue-800">
-                      <strong>Các bước tiếp theo:</strong> Sau khi gửi, nhóm của
-                      chúng tôi sẽ xem xét đơn của bạn và liên hệ trong vòng 2-3
-                      ngày làm việc để thảo luận về quá trình nhận nuôi.
+                      <strong>Lưu ý:</strong> Các trường đánh dấu (*) là bắt
+                      buộc. Sau khi gửi, chúng tôi sẽ liên hệ với bạn trong vòng
+                      2-3 ngày làm việc.
                     </p>
                   </div>
 
-                  <Textarea
-                    label="Ghi Chú Thêm (Tùy chọn)"
-                    placeholder="Nói cho chúng tôi về ngôi nhà của bạn, kinh nghiệm với thú cưng, hoặc bất kỳ câu hỏi nào bạn có..."
-                    value={adoptionNotes}
-                    onChange={(e) => setAdoptionNotes(e.target.value)}
-                    minRows={4}
-                  />
+                  {/* Section 1: Contact Information */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                      1. Thông Tin Liên Hệ
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Input
+                        label="Họ và Tên"
+                        placeholder="Nguyễn Văn A"
+                        value={formData.full_name}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            full_name: e.target.value,
+                          })
+                        }
+                        isRequired
+                        variant="bordered"
+                      />
+                      <Input
+                        label="Số Điện Thoại"
+                        placeholder="0912345678"
+                        value={formData.phone_number}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            phone_number: e.target.value,
+                          })
+                        }
+                        isRequired
+                        variant="bordered"
+                      />
+                      <Input
+                        label="Email"
+                        type="email"
+                        placeholder="email@example.com"
+                        value={formData.email}
+                        onChange={(e) =>
+                          setFormData({ ...formData, email: e.target.value })
+                        }
+                        isRequired
+                        variant="bordered"
+                      />
+                      <Input
+                        label="Địa Chỉ"
+                        placeholder="123 Đường ABC, Quận XYZ"
+                        value={formData.address}
+                        onChange={(e) =>
+                          setFormData({ ...formData, address: e.target.value })
+                        }
+                        isRequired
+                        variant="bordered"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Section 2: Housing Information */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                      2. Thông Tin Nhà Ở
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Select
+                        label="Loại Nhà Ở"
+                        placeholder="Chọn loại nhà ở"
+                        selectedKeys={
+                          formData.housing_type ? [formData.housing_type] : []
+                        }
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            housing_type: e.target.value,
+                          })
+                        }
+                        isRequired
+                        variant="bordered"
+                      >
+                        <SelectItem key="apartment" value="apartment">
+                          Chung cư
+                        </SelectItem>
+                        <SelectItem key="house" value="house">
+                          Nhà riêng
+                        </SelectItem>
+                        <SelectItem key="villa" value="villa">
+                          Biệt thự
+                        </SelectItem>
+                      </Select>
+                      <Input
+                        label="Diện Tích (m²)"
+                        type="number"
+                        placeholder="50"
+                        value={formData.housing_area}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            housing_area: e.target.value,
+                          })
+                        }
+                        variant="bordered"
+                      />
+                    </div>
+                    <div className="mt-4">
+                      <Checkbox
+                        isSelected={formData.has_yard}
+                        onValueChange={(checked) =>
+                          setFormData({ ...formData, has_yard: checked })
+                        }
+                      >
+                        Nhà có sân vườn/không gian ngoài trời
+                      </Checkbox>
+                    </div>
+                  </div>
+
+                  {/* Section 3: Experience & Commitment */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                      3. Kinh Nghiệm và Cam Kết
+                    </h3>
+                    <div className="space-y-4">
+                      <Textarea
+                        label="Kinh Nghiệm Nuôi Thú Cưng"
+                        placeholder="Bạn đã từng nuôi thú cưng chưa? Nếu có, hãy chia sẻ kinh nghiệm của bạn..."
+                        value={formData.pet_experience}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            pet_experience: e.target.value,
+                          })
+                        }
+                        minRows={3}
+                        variant="bordered"
+                      />
+                      <Textarea
+                        label="Lý Do Muốn Nhận Nuôi"
+                        placeholder="Tại sao bạn muốn nhận nuôi thú cưng này?"
+                        value={formData.adoption_reason}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            adoption_reason: e.target.value,
+                          })
+                        }
+                        isRequired
+                        minRows={3}
+                        variant="bordered"
+                      />
+                      <Textarea
+                        label="Cam Kết Chăm Sóc"
+                        placeholder="Bạn cam kết sẽ chăm sóc thú cưng như thế nào? (chi phí, thời gian, chăm sóc y tế...)"
+                        value={formData.care_commitment}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            care_commitment: e.target.value,
+                          })
+                        }
+                        minRows={3}
+                        variant="bordered"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Section 4: Additional Notes */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                      4. Ghi Chú Thêm (Tùy chọn)
+                    </h3>
+                    <Textarea
+                      placeholder="Bất kỳ thông tin nào khác bạn muốn chia sẻ..."
+                      value={formData.notes}
+                      onChange={(e) =>
+                        setFormData({ ...formData, notes: e.target.value })
+                      }
+                      minRows={3}
+                      variant="bordered"
+                    />
+                  </div>
                 </div>
               </ModalBody>
               <ModalFooter>

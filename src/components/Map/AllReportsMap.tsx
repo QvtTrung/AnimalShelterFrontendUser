@@ -12,6 +12,11 @@ import { Link } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import type { Report } from "../../types";
+import {
+  translateReportSpecies,
+  translateReportStatus,
+  translateUrgencyLevel,
+} from "../../utils/translations";
 
 // Fix Leaflet default marker icon
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
@@ -183,7 +188,7 @@ export const AllReportsMap = ({
                             classNames={{ base: "h-5" }}
                           >
                             <span className="text-xs">
-                              {report.urgency_level}
+                              {translateUrgencyLevel(report.urgency_level)}
                             </span>
                           </Chip>
                           <Chip
@@ -192,14 +197,17 @@ export const AllReportsMap = ({
                             variant="flat"
                             classNames={{ base: "h-5" }}
                           >
-                            <span className="text-xs">{report.status}</span>
+                            <span className="text-xs">
+                              {translateReportStatus(report.status)}
+                            </span>
                           </Chip>
                         </div>
                         <p className="text-xs text-gray-600 mb-1 line-clamp-2">
                           {report.description}
                         </p>
                         <p className="text-xs text-gray-500 mb-1">
-                          <strong>Loài:</strong> {report.species}
+                          <strong>Loài:</strong>{" "}
+                          {translateReportSpecies(report.species)}
                         </p>
                         <p className="text-xs text-gray-500 mb-2 line-clamp-1">
                           <strong>Vị trí:</strong> {report.location}

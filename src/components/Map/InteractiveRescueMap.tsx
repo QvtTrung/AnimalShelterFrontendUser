@@ -4,6 +4,11 @@ import { Link } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import type { Report } from "../../types";
+import {
+  translateReportSpecies,
+  translateReportStatus,
+  translateUrgencyLevel,
+} from "../../utils/translations";
 
 // Fix Leaflet default marker icon
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
@@ -172,7 +177,8 @@ export const InteractiveRescueMap = ({
                         {report.description}
                       </p>
                       <p className="text-xs text-gray-500 mb-2">
-                        <strong>Loài:</strong> {report.species}
+                        <strong>Loài:</strong>{" "}
+                        {translateReportSpecies(report.species)}
                       </p>
                       <p className="text-xs text-gray-500 mb-2">
                         <strong>Vị trí:</strong> {report.location}

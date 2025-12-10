@@ -117,6 +117,18 @@ export interface Adoption {
   approval_date?: string;
   notes?: string;
   date_created?: string;
+  
+  // Application form fields
+  full_name?: string;
+  phone_number?: string;
+  email?: string;
+  address?: string;
+  housing_type?: 'apartment' | 'house' | 'villa';
+  housing_area?: number;
+  has_yard?: boolean;
+  pet_experience?: string;
+  adoption_reason?: string;
+  care_commitment?: string;
 }
 
 export interface Notification {

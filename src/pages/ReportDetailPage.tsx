@@ -26,6 +26,12 @@ import { useReport, useClaimReport } from "../hooks/useReports";
 import { useAuthStore } from "../store/auth.store";
 import toast from "react-hot-toast";
 import { ReportMap } from "../components/Map/ReportMap";
+import {
+  translateReportSpecies,
+  translateReportStatus,
+  translateUrgencyLevel,
+  translateReportType,
+} from "../utils/translations";
 
 export const ReportDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -200,8 +206,8 @@ export const ReportDetailPage = () => {
                     {report.title}
                   </h1>
                   <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-                    <span className="capitalize font-medium">
-                      {report.species}
+                    <span className="font-medium">
+                      {translateReportSpecies(report.species)}
                     </span>
                     <span>•</span>
                     <div className="flex items-center gap-1">
@@ -226,20 +232,19 @@ export const ReportDetailPage = () => {
                       color={getUrgencyColor(report.urgency_level)}
                       size="sm"
                       variant="solid"
-                      className="font-semibold capitalize"
+                      className="font-semibold"
                     >
-                      {report.urgency_level} urgency
+                      {translateUrgencyLevel(report.urgency_level)}
                     </Chip>
                     <Chip
                       color={getStatusColor(report.status)}
                       size="sm"
                       variant="flat"
-                      className="capitalize"
                     >
-                      {report.status}
+                      {translateReportStatus(report.status)}
                     </Chip>
-                    <Chip size="sm" variant="flat" className="capitalize">
-                      {report.type.replace("_", " ")}
+                    <Chip size="sm" variant="flat">
+                      {translateReportType(report.type)}
                     </Chip>
                   </div>
                 </CardBody>
@@ -466,12 +471,16 @@ export const ReportDetailPage = () => {
                           Chi Tiết Báo Cáo:
                         </p>
                         <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                          <li className="capitalize">
+                          <li>
                             Mức độ khẩn cấp:{" "}
-                            <strong>{report.urgency_level}</strong>
+                            <strong>
+                              {translateUrgencyLevel(report.urgency_level)}
+                            </strong>
                           </li>
                           <li>Vị trí: {report.location}</li>
-                          <li className="capitalize">Loài: {report.species}</li>
+                          <li>
+                            Loài: {translateReportSpecies(report.species)}
+                          </li>
                         </ul>
                       </div>
                     </>
