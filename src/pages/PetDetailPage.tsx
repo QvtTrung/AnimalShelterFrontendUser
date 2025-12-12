@@ -26,6 +26,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 import { usePet } from "../hooks/usePets";
 import { useCreateAdoption } from "../hooks/useAdoptions";
 import { useAuthStore } from "../store/auth.store";
@@ -83,7 +84,7 @@ export const PetDetailPage = () => {
       !formData.housing_type ||
       !formData.adoption_reason
     ) {
-      alert("Vui lòng điền đầy đủ các trường bắt buộc (đánh dấu *)");
+      toast.error("Vui lòng điền đầy đủ các trường bắt buộc (đánh dấu *)");
       return;
     }
 
@@ -119,13 +120,13 @@ export const PetDetailPage = () => {
         care_commitment: "",
         notes: "",
       });
-      alert(
+      toast.success(
         "Đơn xin nhận nuôi đã gửi thành công! Chúng tôi sẽ liên hệ với bạn sớm."
       );
       navigate("/dashboard");
     } catch (error) {
       console.error("Failed to submit adoption:", error);
-      alert("Gửi đơn xin nhận nuôi thất bại. Vui lòng thử lại.");
+      toast.error("Gửi đơn xin nhận nuôi thất bại. Vui lòng thử lại.");
     }
   };
 
